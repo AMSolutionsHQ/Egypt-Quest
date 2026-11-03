@@ -10,7 +10,7 @@ function openBonus(){const ar=lang==="ar",m=$("bmenu");
  m.style.display="flex";m.querySelectorAll(".bbtn").forEach(b=>b.onclick=()=>b.dataset.k?startBonus(b.dataset.k):(m.style.display="none"))}
 
 let bonusMode=false;
-function finishBonus(p){doneMode="win";$("dnext").style.display=$("dre").style.display="none";
+function finishBonus(p){doneMode="win";doneArt("trophy");setDoneBtns("dbtn");$("dnext").style.display=$("dre").style.display="none";
  if(trial){const t=trial;trial=null;const ok=Progression.applyTrial(SR,PR,t.kind,t.id,t.li);if(ok){const nw=Progression.refreshSites(SR,PR,SITES);if(nw.length)pendingReveal=nw[nw.length-1]}
   snd("win");confetti();qAdd("bonus",1);Ads.countFinish();lastWin=0;render();$("dad").style.display="none";$("dh").textContent=L2("Trial passed!","نجحت في الاختبار!");
   $("dp").textContent=!ok?L2("This trial was already used.","تم استخدام هذا الاختبار من قبل."):t.kind==="tok"?"☥ "+L2("+1 Ankh · balance "+PR.tok,"+1 عنخ · الرصيد "+PR.tok):t.li>=4?L2("Level 5 passed — Endless is open.","اجتزت المستوى 5 — الوضع اللانهائي مفتوح."):L2("Level "+(t.li+1)+" passed — you can now unlock level "+(t.li+2)+".","اجتزت المستوى "+(t.li+1)+" — يمكنك الآن فتح المستوى "+(t.li+2)+".");
@@ -20,7 +20,7 @@ const wrapT=(tx,w)=>{const ws=tx.split(" "),ls=[];let c="";ws.forEach(x=>{const 
 
 
 /* Bonus game lost (below target): no points, offer a retry */
-function loseBonus(msg){if(mode!=="world")return;Ads.countFinish();snd("lose");doneMode="bonusLose";
+function loseBonus(msg){if(mode!=="world")return;Ads.countFinish();snd("lose");doneMode="bonusLose";doneArt("lose");setDoneBtns("dre");
  $("dh").textContent="💀 "+L2("Not this time!","مش المرة دي!");$("dp").textContent=msg||"";$("dad").style.display="none";
  $("dnext").style.display="none";$("dre").style.display="block";$("dre").textContent="↻ "+L2("Try again","حاول مرة أخرى");$("dbtn").textContent=L2("Back to map","العودة للخريطة");
  later(()=>{$("done").style.display="flex"},700)}

@@ -137,6 +137,14 @@ python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
 python3 tests/e2e/visual_e2e.py   # fonts, icons, overflow, reduced motion
 ```
 
+## Changelog — v4.8 (redesign phase 3: play & results)
+
+- **Level intro**: place illustration, game type, how to play, three rule tiles (hearts · ★★★ rule · time par), Cancel + gold Start side by side. Bonus games and Scribe's Trials get their own icon and label.
+- **In-game HUD**: back button with arrow, rounder buttons, clearer status pill (no letter spacing).
+- **Win dialog**: three big stars that pop in one by one (earned ones gold), light rays behind, reward tiles for points (counts up) and Ankh, one row per detail (time & speed, multipliers, daily bonus, perfect hint, Ankh tip, lost heart), a note for the next place, and **exactly one gold primary button** (Next level / Unlock & play, or *New place unlocked* when a place opened). Retry and Map sit side by side; the optional ad is last.
+- **Lose dialog**: broken-heart art, reason and tip rows, *Try again* as the primary button, Scribe's Trial when offered.
+- Bonus wins show a trophy. Animations stop with *reduce motion*. Same buttons and logic as before.
+
 ## Changelog — v4.7 (redesign phase 2: map & places)
 
 - **16 place illustrations** (`assets/places/<id>.svg`, 2–6 KB each, drawn in code, offline): shown as a banner on the place card and as the header of the level select. `placeArt(id)` in `core/state.js` returns the path.
