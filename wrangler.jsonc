@@ -1,0 +1,9 @@
+// Cloudflare Workers deploy settings (used by `npx wrangler deploy` in Workers Builds).
+// Publishes only the www/ folder as static files; www/_headers sets caching and security headers.
+{
+  "name": "egypt-quest",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./www"
+  }
+}
