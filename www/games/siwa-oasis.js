@@ -22,8 +22,8 @@ definePlace({
     one at a time, while the player follows it (any other move cancels the hint).
     Plan = weighted A* search (Manhattan distance, small time budget); fallback = `path`, the positions the
     empty square visited since the solved picture — walking it backwards always solves the puzzle. Shorter one wins. */
- const HINT_STEPS=3;let path=[],plan=null,hintLeft=0,hintsUsed=0;
- const NN=()=>n*n,lim=()=>Math.round(md0*5+20); // move limit → lose
+ const HINT_STEPS=3;let path=[],plan=null,hintLeft=0,hintsUsed=0,extra=0;
+ const NN=()=>n*n,baseLim=()=>Math.round(md0*5+20),lim=()=>baseLim()+extra; // move limit → lose; a hint plan always fits (extra moves)
  const nb=b=>{const r=Math.floor(b/n),c=b%n,o=[];if(r>0)o.push(b-n);if(r<n-1)o.push(b+n);if(c>0)o.push(b-1);if(c<n-1)o.push(b+1);return o};
  const isSolved=()=>a.every((v,i)=>v===i);
  const btn=()=>{const{s,x0,y0}=tileLay(n);return{x:W/2-100,y:y0+s+18,w:200,h:42}};
@@ -41,7 +41,7 @@ definePlace({
  function makePlan(){const back=path.slice(0,-1).reverse(),w=n===3?1:n===4?2.5:7;let found=search(w,180);if(!found&&n===4)found=search(w*2.5,150);
   return found&&found.length<=back.length?found:back}
  return{help:{en:"Slide the tiles to rebuild the Siwa Oasis picture. Higher levels use smaller pieces. Stuck? Tap Hint to see the next moves",ar:"حرّك القطع لإعادة بناء صورة واحة سيوة. المستويات الأعلى بقطع أصغر. عالق؟ اضغط تلميح لترى الحركات التالية"},
- start(){const lv=Math.min(LV(),4);n=[3,3,4,4,5][lv];pic=pickScene("siwa");a=[...Array(NN()).keys()];moves=0;solved=false;hintLeft=0;hintsUsed=0;plan=null;let b=NN()-1,last=-1;path=[b];
+ start(){const lv=Math.min(LV(),4);n=[3,3,4,4,5][lv];pic=pickScene("siwa");a=[...Array(NN()).keys()];moves=0;solved=false;hintLeft=0;hintsUsed=0;plan=null;extra=0;let b=NN()-1,last=-1;path=[b];
   const step=()=>{const c=nb(b).filter(x=>x!==last),m=c[Math.floor(Math.random()*c.length)];[a[b],a[m]]=[a[m],a[b]];last=b;b=m;path.push(m)};
   const steps=Math.round([14,45,60,120,200][lv]*(n>3?1.6:1));for(let k=0;k<steps;k++)step();while(isSolved())step();
   md0=a.reduce((m,v,i)=>v===NN()-1?m:m+Math.abs(Math.floor(i/n)-Math.floor(v/n))+Math.abs(i%n-v%n),0)},
@@ -57,10 +57,10 @@ definePlace({
   /* hint button (uses the shared hint stock; when empty it offers a rewarded ad) */
   if(!solved){const bt=btn(),has=inv.hint>0;ctx.fillStyle=has?"#2a3350":"#3a3a44";rr(bt.x,bt.y,bt.w,bt.h,12);ctx.fill();ctx.strokeStyle="#e6b84a";ctx.lineWidth=2;ctx.stroke();
    const gx=bt.x+26,gy=bt.y+bt.h/2-1;ctx.fillStyle="#f3c969";ctx.beginPath();ctx.arc(gx,gy-3,7,Math.PI*.8,Math.PI*2.2);ctx.lineTo(gx+3,gy+6);ctx.lineTo(gx-3,gy+6);ctx.closePath();ctx.fill();ctx.fillRect(gx-3,gy+8,6,2.5);
-   ctx.fillStyle="#fff";ctx.font="bold 16px system-ui";ctx.textAlign="center";ctx.fillText(hintLeft>0?L2("Follow the arrow","اتبع السهم"):L2("Hint","تلميح")+" ("+(has?inv.hint:L2("ad","إعلان"))+")",bt.x+bt.w/2+14,bt.y+bt.h/2+6)}},
+   ctx.fillStyle="#fff";ctx.font="bold 16px system-ui";ctx.textAlign="center";ctx.fillText(hintLeft>0?L2("Follow the arrow","اتبع السهم"):L2("Hint","تلميح")+" ("+(has?inv.hint:Ads.canReward()?L2("ad","إعلان"):"0")+")",bt.x+bt.w/2+14,bt.y+bt.h/2+6)}},
  tap(px,py){if(solved)return;
   {const bt=btn();if(px>=bt.x&&px<=bt.x+bt.w&&py>=bt.y&&py<=bt.y+bt.h){if(hintLeft>0)return;
-   if(inv.hint<1){adForHints();return}if(!plan||!plan.length)plan=makePlan();if(!plan.length)return;inv.hint--;hintsUsed++;hintLeft=HINT_STEPS;snd("tap");render();return}}
+   if(inv.hint<1){adForHints();return}if(!plan||!plan.length)plan=makePlan();if(!plan.length)return;extra=Math.max(extra,moves+plan.length+3-baseLim());inv.hint--;hintsUsed++;hintLeft=HINT_STEPS;snd("tap");render();return}}
   const{x0,y0,t}=tileLay(n),c=Math.floor((px-x0)/t),r=Math.floor((py-y0)/t);if(c<0||c>=n||r<0||r>=n)return;const i=r*n+c,b=a.indexOf(NN()-1);
   if(!nb(b).includes(i))return;[a[b],a[i]]=[a[i],a[b]];moves++;snd("tap");
   if(path.length>=2&&path[path.length-2]===i)path.pop();else path.push(i);                 // keep the undo path up to date

@@ -5,7 +5,10 @@ let lang="en",score=0,sel=null,mode="map",cur=null;const seen=new Set(),done=new
 let PR=Progression.fresh(),pendingReveal=null;
 const unlocked=i=>i===0||(i>0&&!!SITES[i]&&(Progression.placeOpen(PR,SITES,i)||done.has(SITES[i].id)));
 const nextLocked=()=>SITES.findIndex((s,i)=>!unlocked(i));
-/* v4.5: places are bought with points (config PROGRESSION.placeUnlock="points"), in map order */
+/* v4.5: places are bought with coins (config PROGRESSION.placeUnlock="points"), in map order */
+/* v5.1 cosmetics: frame colour of the place markers on the map (bought in Shop → Charms) */
+const FRAMES={gold:{en:"Gold",ar:"ذهبي",c:"#fff7dd",cost:0},lapis:{en:"Lapis",ar:"لازورد",c:"#5B95F2",cost:150},jade:{en:"Faience",ar:"فيروزي",c:"#3CC6A8",cost:250},carnelian:{en:"Carnelian",ar:"عقيق",c:"#F0675A",cost:300},amethyst:{en:"Amethyst",ar:"جمشت",c:"#B48CF0",cost:400}};
+let frame="gold";
 /* v4.6 phase 5: player settings (saved): vibration on mistakes, reduce motion (also follows the system setting) */
 let vibOn=true,motionOff=false;
 const motionReduced=()=>motionOff||!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -20,7 +23,7 @@ const placeCostOf=i=>Progression.placeCost(SITES[i],i);
 const placeProg=i=>!(i>0&&SITES[i-1])?null:pointsMode()?{frac:unlocked(i-1)?Math.min(1,bal()/Math.max(1,placeCostOf(i))):0}:Progression.placeProgress(SR,PR,SITES[i-1],Progression.ruleOf(SITES[i]));
 const progTxt=(pp,nm)=>L2("Complete levels 1–"+pp.needLevels+" ("+pp.levels+"/"+pp.needLevels+") and earn "+pp.needStars+"★ ("+Math.min(pp.stars,pp.needStars)+"/"+pp.needStars+") in "+nm[0],
  "أكمل المستويات 1–"+pp.needLevels+" ("+pp.levels+"/"+pp.needLevels+") واجمع "+pp.needStars+"★ ("+Math.min(pp.stars,pp.needStars)+"/"+pp.needStars+") في "+nm[1]);
-const lockText=i=>{if(!(i>0&&SITES[i]))return"";if(pointsMode()){const c=placeCostOf(i);return!unlocked(i-1)?L2("Unlock "+SITES[i-1].en+" first","افتح "+SITES[i-1].ar+" أولًا"):bal()>=c?L2("Unlock for "+c+" points","افتحه مقابل "+c+" نقطة"):L2("Needs "+c+" points (you have "+bal()+")","يحتاج "+c+" نقطة (لديك "+bal()+")")}
+const lockText=i=>{if(!(i>0&&SITES[i]))return"";if(pointsMode()){const c=placeCostOf(i);return!unlocked(i-1)?L2("Unlock "+SITES[i-1].en+" first","افتح "+SITES[i-1].ar+" أولًا"):bal()>=c?L2("Unlock for "+c+" coins","افتحه مقابل "+c+" عملة"):L2("Needs "+c+" coins (you have "+bal()+")","يحتاج "+c+" عملة (لديك "+bal()+")")}
  const pp=placeProg(i);return pp?progTxt(pp,[SITES[i-1].en,SITES[i-1].ar]):""};
 /* Spend points to open place i. Returns true when it opened. */
 function buyPlace(i){const r=Progression.buyPlace(PR,SITES,i,unlocked(i-1),bal());if(!r.ok)return false;spent+=r.cost;
@@ -52,6 +55,6 @@ const later=(fn,ms)=>{const s=runSeq;return setTimeout(()=>{if(s===runSeq&&mode=
 /* Lives: every place run starts with ❤❤❤ (one less on level 5+). A mistake costs a heart; 0 = level lost. */
 let lives=3,maxLives=3,runLost=false,hurtT=0,contUsed=false,loseT=0,pendingWin=0,doneMode="win",bonusKey="";
 const hearts=()=>"♥".repeat(Math.max(0,lives))+"♡".repeat(Math.max(0,maxLives-lives)); // text hearts (not emoji)
-let lastLostHeart=false,lastNewUnlock=false,lastTok=0,lastPrev=0,nextAct="play";
+let lastBestT=false,lastLostHeart=false,lastNewUnlock=false,lastTok=0,lastPrev=0,nextAct="play";
 /* Scribe's Trial run ({kind,id,li}) and where to return after it; map reveal of a newly opened place */
 let trial=null,trialBack=null,revealAt=null;

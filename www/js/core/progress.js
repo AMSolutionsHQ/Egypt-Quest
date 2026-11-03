@@ -6,7 +6,7 @@ function showIntro(go,opt){opt=opt||{};if(!opt.bonus&&!sel&&lastSite)sel=lastSit
  const ic=n=>'<span class="ico ico-'+n+'" aria-hidden="true"></span>';
  /* v4.6 phase 3: intro card — place art / game icon, title, how to play, rule tiles, Cancel + Start */
  const rule=(icn,txt,cls)=>'<div class="in-rule'+(cls?" "+cls:"")+'">'+icn+'<span>'+txt+'</span></div>';
- const extra=opt.bonus?(trial?'<p class="in-trial">'+ic("sparkle")+" "+(trial.kind==="tok"?L2("Reach the target to earn +1 Ankh (no points).","حقق الهدف لتربح +1 عنخ (بدون نقاط)."):L2("Reach the target to pass level "+(trial.li+1)+" (0★, no Ankh).","حقق الهدف لتجتاز المستوى "+(trial.li+1)+" (0★ بدون عنخ)."))+'</p>':""):
+ const extra=opt.bonus?(trial?'<p class="in-trial">'+ic("sparkle")+" "+(trial.kind==="tok"?L2("Reach the target to earn +1 Ankh (no coins).","حقق الهدف لتربح +1 عنخ (بدون عملات)."):L2("Reach the target to pass level "+(trial.li+1)+" (0★, no Ankh).","حقق الهدف لتجتاز المستوى "+(trial.li+1)+" (0★ بدون عنخ)."))+'</p>':""):
   '<div class="in-rules">'+rule('<span class="in-hearts">'+"♥".repeat(maxLives)+'</span>',L2(maxLives+" hearts — every mistake costs one","قلوب: "+maxLives+" — كل خطأ يكلّفك قلبًا"),"is-heart")+
   rule('<span class="in-stars">★★★</span>',L2("★★★ needs no lost hearts","★★★ بدون خسارة أي قلب")+' · '+STX[sel.id][ar?1:0])+
   rule(ic("clock"),L2("Finish within "+parOf(sel.id)+"s for the full speed bonus","أنهِ خلال "+parOf(sel.id)+" ثانية للحصول على مكافأة السرعة كاملة"))+'</div>';
@@ -29,8 +29,8 @@ function openLevels(){const ar=lang==="ar",m=$("bmenu"),id=sel.id,b=SR[id]||(SR[
  const row=(attrs,cls,ic,title,sub,right)=>'<button class="bbtn lvrow '+cls+'" '+attrs+'><span class="lv-ic">'+icon(ic)+'</span><span class="lv-tx"><b>'+title+'</b><small>'+sub+'</small></span>'+(right?'<span class="lv-st">'+right+'</span>':"")+'</button>';
  let nextI=-1;for(let i=0;i<5;i++)if(nextI<0&&Progression.levelStatus(SR,PR,id,i)==="open"&&!Progression.levelDone(SR,PR,id,i))nextI=i;
  const rows=[0,1,2,3,4].map(i=>{const st=Progression.levelStatus(SR,PR,id,i),dn=Progression.levelDone(SR,PR,id,i),cost=Progression.levelCost(i),nm=L2("Level ","المستوى ")+(i+1)+" · "+LVN[i][ar?1:0],info=lvInfo(id,i+1);
-  if(st==="open")return row('data-l="'+(i+1)+'"',dn?"is-done":i===nextI?"is-next":"is-open",dn?"check":"play",nm,(cl[i]&&!b[i]?L2("passed by trial","اجتزته بالاختبار"):info||(dn?L2("Replay to beat your best","أعد اللعب لتحسين نتيجتك"):L2("Ready to play","جاهز للعب"))),stars(b[i]))+
-   (Progression.passageTrial(SR,PR,id,i)?row('data-t="pass" data-i="'+i+'"',"trial","sparkle",TR+": "+L2("pass level "+(i+1),"اجتز المستوى "+(i+1)),L2("Win a bonus game to mark this level passed (0★, no Ankh)","اربح لعبة إضافية لتجتاز هذا المستوى (0★ بدون عنخ)")):"");
+  if(st==="open"){const bt=Records.time(id,i),bts=bt?" · "+L2("best ","الأفضل ")+Math.floor(bt/60)+":"+String(bt%60).padStart(2,"0"):"";return row('data-l="'+(i+1)+'"',dn?"is-done":i===nextI?"is-next":"is-open",dn?"check":"play",nm,(cl[i]&&!b[i]?L2("passed by trial","اجتزته بالاختبار"):(info||(dn?L2("Replay to beat your best","أعد اللعب لتحسين نتيجتك"):L2("Ready to play","جاهز للعب"))))+bts,stars(b[i]))+
+   +(Progression.passageTrial(SR,PR,id,i)?row('data-t="pass" data-i="'+i+'"',"trial","sparkle",TR+": "+L2("pass level "+(i+1),"اجتز المستوى "+(i+1)),L2("Win a bonus game to mark this level passed (0★, no Ankh)","اربح لعبة إضافية لتجتاز هذا المستوى (0★ بدون عنخ)")):"")}
   if(st==="afford")return row('data-u="'+i+'"',"unlock","ankh",nm,L2("Tap to unlock for ","اضغط للفتح مقابل ")+ankh(cost)+" · "+L2("you have ","لديك ")+ankh(PR.tok),'<span class="lv-cost">'+ankh(cost)+'</span>');
   if(st==="short")return row("disabled","is-lock","lock",nm,L2("Needs ","يحتاج ")+ankh(cost)+" · "+L2("you have ","لديك ")+ankh(PR.tok)+" · "+L2("earn Ankh by beating your best stars","اربح العنخ بتحسين أفضل نجومك"),'<span class="lv-cost">'+ankh(cost)+'</span>')+
    (tt===i?row('data-t="tok" data-i="'+i+'"',"trial","sparkle",TR+": +"+ankh(1),L2("Win a bonus game · "+trLeft("tok")+" left at this place","اربح لعبة إضافية · متبقٍ "+trLeft("tok")+" هنا")):"");
@@ -40,7 +40,7 @@ function openLevels(){const ar=lang==="ar",m=$("bmenu"),id=sel.id,b=SR[id]||(SR[
  '<div class="lv-title"><span class="lv-kind">'+CH[id][ar?1:0]+'</span><h2>'+(ar?sel.ar:sel.en)+'</h2></div></div><div class="lv-body">'+
  '<div class="lv-prog"><span class="ico ico-star" aria-hidden="true"></span><span class="lv-prog-tx">'+st5+"/15 · "+L2("each new best star = 1 Ankh","كل نجمة أفضل جديدة = 1 عنخ")+'</span><i class="lv-bar"><b style="width:'+Math.round(100*st5/15)+'%"></b></i></div>'+
  '<p class="lvhead">'+placeGoalTxt(si)+'</p>'+rows+
- '<div class="lv-foot"><button class="bbtn lv-toggle'+(curseOn?" on":"")+'" id="cm" aria-pressed="'+curseOn+'"><span class="lv-sw" aria-hidden="true"></span><span class="lv-tx"><b>'+L2("Curse mode: ","وضع اللعنة: ")+(curseOn?L2("ON","مفعّل"):L2("OFF","متوقف"))+'</b><small>'+L2("Mistakes cost points, but your reward is ×2","كل خطأ يخسّرك نقاطًا، لكن مكافأتك ×2")+'</small></span></button>'+
+ '<div class="lv-foot"><button class="bbtn lv-toggle'+(curseOn?" on":"")+'" id="cm" aria-pressed="'+curseOn+'"><span class="lv-sw" aria-hidden="true"></span><span class="lv-tx"><b>'+L2("Curse mode: ","وضع اللعنة: ")+(curseOn?L2("ON","مفعّل"):L2("OFF","متوقف"))+'</b><small>'+L2("Mistakes cost coins, but your reward is ×2","كل خطأ يخسّرك عملات، لكن مكافأتك ×2")+'</small></span></button>'+
  (Progression.endlessOpen(SR,PR,id)?row('data-l="'+((ENDL[id]||5)+1)+'"',"is-endless","infinity",L2("Endless","لا نهائي")+" · "+L2("Level ","المستوى ")+((ENDL[id]||5)+1),L2("Beat it to climb higher. It never ends!","اجتزه لتصعد أعلى. لا ينتهي أبدًا!")):"")+'</div></div></div>';
  m.style.display="flex";m.querySelectorAll("[data-l]").forEach(x=>x.onclick=()=>startSite(+x.dataset.l));
  m.querySelectorAll("[data-u]").forEach(x=>x.onclick=()=>{const r=Progression.unlockLevel(SR,PR,id,+x.dataset.u);if(r.ok){snd("ok");toastTx=L2("Level "+(+x.dataset.u+1)+" unlocked","فُتح المستوى "+(+x.dataset.u+1));toastT=performance.now()+1800}render();openLevels()});
@@ -53,8 +53,10 @@ function winGameCore(perf){perf=Math.max(1,Math.min(3,perf||1));const el=(perfor
  if(endless){if(imp)ENDL[id]=curLevel}else if(imp)b[li]=stars;lastPrev=prev;lastTok=endless?0:Progression.recordWin(PR,id,li,prev,stars);{const nw=Progression.refreshSites(SR,PR,SITES);if(nw.length)pendingReveal=nw[nw.length-1]}lastNewUnlock=!wasNext&&si+1<SITES.length&&unlocked(si+1);
  lastStars=stars;lastLvlUnlock=!endless&&li<4&&prev===0;done.add(id);lastDaily=claimDaily(id);p+=lastDaily;lastBoost=false;if(inv.boost>0){p=Math.round(p*1.5);inv.boost--;lastBoost=true}
  lastEvent=eventMult()>1;if(lastEvent)p*=2;lastCurse=curseRun;if(curseRun)p*=2;if(stars===3)inv.hint++;qAdd("win",1);qAdd("star",stars);if(stars===3)qAdd("three",1);if(curLevel>=3)qAdd("hard",1);
- p=Math.max(1,Math.round(p*RATE));lastDaily=Math.round(lastDaily*RATE);lastWin=p;score+=p;Ads.countFinish();try{celebrate(stars)}catch(e){showErr("celebration: "+e.message)}render();setTimeout(()=>{try{showDone()}catch(e){showErr("result: "+e.message);fallbackDone()}},1900)}
-function winGame(perf){if(runLost){pendingWin=perf||1;return}if(runWon||mode!=="world")return;if(!sel&&lastSite)sel=lastSite;if(!sel)return;runWon=true;lastSite=sel;try{winGameCore(perf)}catch(e){showErr("win: "+e.message);try{render()}catch(_){}setTimeout(()=>{try{showDone()}catch(_){fallbackDone()}},1200)}}
+ p=Math.max(1,Math.round(p*RATE));lastDaily=Math.round(lastDaily*RATE);lastWin=p;qAdd("coins",p);if(p>=40)qAdd("big",1);
+ lastBestT=!endless&&Records.bestTime(id,li,el);Records.add({i:id,l:curLevel,c:p,t:Math.round(el),s:stars});score+=p;Ads.countFinish();try{celebrate(stars)}catch(e){showErr("celebration: "+e.message)}render();{const rs=runSeq;/* run-scoped: leaving the level before the dialog appears cancels it (it never pops up over the next screen) */
+ setTimeout(()=>{if(rs!==runSeq)return;try{showDone()}catch(e){showErr("result: "+e.message);fallbackDone()}},1900)}}
+function winGame(perf){if(runLost){pendingWin=perf||1;return}if(runWon||mode!=="world")return;if(!sel&&lastSite)sel=lastSite;if(!sel)return;runWon=true;lastSite=sel;try{winGameCore(perf)}catch(e){showErr("win: "+e.message);try{render()}catch(_){}const rs=runSeq;setTimeout(()=>{if(rs!==runSeq)return;try{showDone()}catch(_){fallbackDone()}},1200)}}
 /* v4.6 phase 3: result dialog parts — big art (stars / broken heart / trophy), reward tiles, detail rows, one primary button */
 const dIc=n=>'<span class="ico ico-'+n+'" aria-hidden="true"></span>';
 const STAR_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.6 4.4 1.1 6.2L12 17.1 6.4 20l1.1-6.2-4.6-4.4 6.3-.9z"/></svg>';
@@ -70,14 +72,15 @@ function countUp(){if(motionReduced())return;$("dp").querySelectorAll(".dnum[dat
 function fallbackDone(){doneArt("stars",lastStars||1);$("dh").textContent=L2("Level complete!","اكتمل المستوى!");$("dp").textContent="";setRich($("dnext"),["@play"," "+L2("Next level","المستوى التالي")]);setRich($("dre"),["@retry"," "+L2("Retry","إعادة")]);setRich($("dbtn"),["@map"," "+L2("Back to map","العودة للخريطة")]);$("dnext").style.display=$("dre").style.display="block";$("dad").style.display="none";setDoneBtns("dnext");$("done").style.display="flex"}
 function showDone(){doneMode="win";if(!sel&&lastSite)sel=lastSite;const t=T[lang],i=SITES.indexOf(lastSite||sel),nx=nextInfo();nextAct=nx.act;
  doneArt("stars",lastStars);$("dh").textContent=t.doneH;
- const tiles='<div class="dtiles"><div class="dtile is-coin"><span class="dtile-l">'+dIc("coin")+L2("Points","النقاط")+'</span><span class="dtile-v"><span class="dnum" data-to="'+lastWin+'">+'+lastWin+'</span> <small>'+L2("points","نقطة")+'</small></span></div>'+
+ const tiles='<div class="dtiles"><div class="dtile is-coin"><span class="dtile-l">'+dIc("coin")+L2("Coins","العملات")+'</span><span class="dtile-v"><span class="dnum" data-to="'+lastWin+'">+'+lastWin+'</span> <small>'+L2("coins","عملة")+'</small></span></div>'+
   (curLevel<=5?'<div class="dtile is-ankh"><span class="dtile-l">'+dIc("ankh")+L2("Ankh","عنخ")+'</span><span class="dtile-v"><span class="dnum">+'+lastTok+'</span> <small>Ankh</small></span><span class="dtile-s">'+L2("balance ","الرصيد ")+PR.tok+'</span></div>':"")+'</div>';
  let rows=dRow("clock",Math.round(lastTime)+L2("s (par ","ث (الهدف ")+lastPar+L2("s) · speed ","ث) · السرعة ")+starTxt(lastTs)+" · "+L2("skill ","المهارة ")+starTxt(lastPerf));
  if(lastBoost||lastEvent||lastCurse)rows+=dRow("bolt",[lastBoost?L2("Boost ×1.5","تعزيز ×1.5"):"",lastEvent?L2("Weekend ×2","عطلة ×2"):"",lastCurse?L2("Curse ×2","لعنة ×2"):""].filter(Boolean).join(" · "));
+ if(lastBestT)rows+=dRow("clock",L2("New fastest time for this level!","أسرع وقت جديد لهذا المستوى!"),"is-best");
  if(lastDaily)rows+=dRow("star",L2("Daily bonus +"+lastDaily+" · streak "+streak,"مكافأة يومية +"+lastDaily+" · تتابع "+streak));
  if(lastStars===3)rows+=dRow("bulb",L2("Perfect! +1 free hint","ممتاز! +1 تلميح مجاني"));
  if(curLevel<=5&&!lastTok)rows+=dRow("ankh",L2("No new Ankh — beat your best ("+starTxt(lastPrev)+") to earn more","لا عنخ جديد — تفوّق على أفضل نتيجة ("+starTxt(lastPrev)+")"));
- if(lastCurse)rows+=dRow("skull",L2("Curse mode: lost "+curseLost+" points","وضع اللعنة: خسرت "+curseLost+" نقطة"));
+ if(lastCurse)rows+=dRow("skull",L2("Curse mode: lost "+curseLost+" coins","وضع اللعنة: خسرت "+curseLost+" عملة"));
  if(lastLostHeart&&lastStars<3)rows+=dRow("heart",L2("You lost a heart — ★★★ needs a flawless run","خسرت قلبًا — ★★★ تحتاج جولة بدون أخطاء"));
  let note="";if(lastNewUnlock)note=dRow("map",L2(SITES[i+1].en+" is now open!",SITES[i+1].ar+" مفتوح الآن!"),"dnote is-new");else if(i>=0&&i<SITES.length-1&&!unlocked(i+1))note=dRow("pyramid",(pointsMode()?L2("Next place — "+SITES[i+1].en+": ","المكان التالي — "+SITES[i+1].ar+": "):"")+lockText(i+1),"dnote");else if(i===SITES.length-1&&Progression.journeyDone(SR,PR,SITES))note=dRow("trophy",L2("Journey complete — you explored all of Egypt!","اكتملت الرحلة — استكشفت مصر كلها!"),"dnote is-new");
  if(nx.txt)note+=dRow("ankh",nx.txt.replace(/^☥\s*/,""),"dnote");
@@ -102,7 +105,7 @@ $("dbtn").onclick=()=>doneGo(()=>{if(bonusMode||doneMode!=="win"){const tb=trial
 /* Optional rewarded ad: double the points of the run you just finished */
 function offerDouble(){const b=$("dad"),on=Ads.canReward()&&lastWin>0;b.style.display=on?"block":"none";b.disabled=false;b.textContent="🎬 "+L2("Watch an ad: double to +"+lastWin*2,"شاهد إعلانًا: ضاعف إلى +"+lastWin*2)}
 $("dad").onclick=async()=>{const b=$("dad");if(doneMode==="lose"){continueRun();return}b.disabled=true;const won=lastWin;const ok=await Ads.rewarded("double_points");
- if(ok){score+=won;lastWin=0;b.style.display="none";dpAppend("video",L2("Doubled! +"+won+" more points","تمت المضاعفة! +"+won+" نقطة إضافية"));snd("win");confetti();render()}
+ if(ok){score+=won;lastWin=0;b.style.display="none";dpAppend("video",L2("Doubled! +"+won+" more coins","تمت المضاعفة! +"+won+" عملة إضافية"));snd("win");confetti();render()}
  else{b.disabled=false;toastTx=L2("No ad available right now","لا يوجد إعلان متاح الآن");toastT=performance.now()+2000}};
 
 /* ---------- LOSING ---------- */
@@ -115,7 +118,7 @@ function loseGame(reason){if(runWon||runLost||mode!=="world")return;runLost=true
 const LOSE_TIPS=[["Slow down — accuracy beats speed.","هدّي — الدقة أهم من السرعة."],["Read the ℹ️ help before you start.","اقرأ تعليمات ℹ️ قبل البدء."],["Every mistake costs a heart.","كل خطأ يكلّفك قلبًا."]];
 function showLose(reason){doneMode="lose";const tip=LOSE_TIPS[Math.floor(Math.random()*LOSE_TIPS.length)];
  doneArt("lose");$("dh").textContent=L2("Level failed","خسرت المستوى");
- $("dp").innerHTML='<div class="drows">'+(reason?dRow("heart",reason):"")+dRow("coin",L2("No points this time.","لا نقاط هذه المرة."))+dRow("bulb",tip[lang==="ar"?1:0])+(curseRun&&curseLost?dRow("skull",L2("Curse mode: lost "+curseLost+" points","وضع اللعنة: خسرت "+curseLost+" نقطة")):"")+'</div>';
+ $("dp").innerHTML='<div class="drows">'+(reason?dRow("heart",reason):"")+dRow("coin",L2("No coins this time.","لا عملات هذه المرة."))+dRow("bulb",tip[lang==="ar"?1:0])+(curseRun&&curseLost?dRow("skull",L2("Curse mode: lost "+curseLost+" coins","وضع اللعنة: خسرت "+curseLost+" عملة")):"")+'</div>';
  $("dnext").style.display="none";$("dre").style.display="block";setRich($("dre"),["@retry"," "+L2("Try again","حاول مرة أخرى")]);setRich($("dbtn"),["@map"," "+L2("Back to map","العودة للخريطة")]);setDoneBtns("dre");
  if(sel&&Progression.passageTrial(SR,PR,sel.id,curLevel-1)){$("dnext").style.display="block";setRich($("dnext"),["@sparkle"," "+L2("Scribe's Trial: pass this level","اختبار الكاتب: اجتز هذا المستوى")]);$("dp").insertAdjacentHTML("beforeend",dRow("sparkle",L2("Stuck? Win a bonus game to pass this level (0★, no Ankh). Once per place.","عالق؟ اربح لعبة إضافية لتجتاز هذا المستوى (0★ بدون عنخ). مرة واحدة لكل مكان."),"dnote"))}
  const b=$("dad"),can=!contUsed&&Ads.canReward();b.style.display=can?"block":"none";b.disabled=false;b.textContent="🎬 "+L2("Watch an ad: +1 ♥ and continue","شاهد إعلانًا: +1 ♥ وأكمل");$("done").style.display="flex"}

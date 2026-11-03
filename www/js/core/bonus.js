@@ -5,7 +5,7 @@ function startTrial(kind,id,li){const ks=Object.keys(BONUS),si=Math.max(0,SITES.
 function startBonus(k,tr){runSeq++;trial=tr||null;trialBack=trial?trial.id:null;bonusKey=k;runWon=false;curseRun=false;cur=BONUS[k];showIntro(()=>{$("bmenu").style.display="none";cur.game.start();bonusMode=true;mode="world";document.body.classList.add("g");render()},{bonus:true})}
 const BONUS_IC={rush:"scarab",quiz:"book",catch:"gift"};
 function openBonus(){const ar=lang==="ar",m=$("bmenu");
- m.innerHTML='<div class="box sheet bonus-box">'+menuHead("gamepad",L2("Bonus games","ألعاب إضافية"),"bncl")+'<p class="sh-sub2">'+L2("Replay anytime to earn more points","العب في أي وقت لتربح نقاطًا أكثر")+'</p>'+
+ m.innerHTML='<div class="box sheet bonus-box">'+menuHead("gamepad",L2("Bonus games","ألعاب إضافية"),"bncl")+'<p class="sh-sub2">'+L2("Replay anytime to earn more coins","العب في أي وقت لتربح عملات أكثر")+'</p>'+
  Object.keys(BONUS).map(k=>'<button class="bbtn bcard" data-k="'+k+'"><span class="mc-ic">'+icn(BONUS_IC[k]||"gamepad")+'</span><span class="mc-body"><b>'+BONUS[k].bonus[ar?1:0]+'</b><small>'+BONUS[k].desc[ar?1:0]+'</small></span><span class="bc-play">'+icn("play")+'</span></button>').join("")+'</div>';
  $("bncl").onclick=()=>{m.style.display="none"};
  m.style.display="flex";m.querySelectorAll(".bbtn").forEach(b=>b.onclick=()=>b.dataset.k?startBonus(b.dataset.k):(m.style.display="none"))}
@@ -16,7 +16,7 @@ function finishBonus(p){doneMode="win";doneArt("trophy");setDoneBtns("dbtn");$("
   snd("win");confetti();qAdd("bonus",1);Ads.countFinish();lastWin=0;render();$("dad").style.display="none";$("dh").textContent=L2("Trial passed!","نجحت في الاختبار!");
   $("dp").textContent=!ok?L2("This trial was already used.","تم استخدام هذا الاختبار من قبل."):t.kind==="tok"?"☥ "+L2("+1 Ankh · balance "+PR.tok,"+1 عنخ · الرصيد "+PR.tok):t.li>=4?L2("Level 5 passed — Endless is open.","اجتزت المستوى 5 — الوضع اللانهائي مفتوح."):L2("Level "+(t.li+1)+" passed — you can now unlock level "+(t.li+2)+".","اجتزت المستوى "+(t.li+1)+" — يمكنك الآن فتح المستوى "+(t.li+2)+".");
   $("dbtn").textContent=L2("Back to levels","العودة للمستويات");$("done").style.display="flex";return}
- p=Math.round(p*eventMult()*RATE);snd("win");confetti();qAdd("bonus",1);score+=p;lastWin=p;Ads.countFinish();render();$("dh").textContent=L2("Great job!","أحسنت!");$("dp").textContent=L2("You earned +"+p+" points","ربحت +"+p+" نقطة");$("dbtn").textContent=L2("Back to map","العودة للخريطة");offerDouble();$("done").style.display="flex"}
+ p=Math.round(p*eventMult()*RATE);snd("win");confetti();qAdd("bonus",1);qAdd("coins",p);Records.add({i:bonusKey,l:0,c:p,t:0,s:0});score+=p;lastWin=p;Ads.countFinish();render();$("dh").textContent=L2("Great job!","أحسنت!");$("dp").textContent=L2("You earned +"+p+" coins","ربحت +"+p+" عملة");$("dbtn").textContent=L2("Back to map","العودة للخريطة");offerDouble();$("done").style.display="flex"}
 const wrapT=(tx,w)=>{const ws=tx.split(" "),ls=[];let c="";ws.forEach(x=>{const n=c?c+" "+x:x;if(ctx.measureText(n).width>w&&c){ls.push(c);c=x}else c=n});if(c)ls.push(c);return ls};
 
 

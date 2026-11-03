@@ -19,5 +19,7 @@ Ads.init();
 QGen.warm();   // prefetch fresh quiz data in the background
 App.init();
 
+let loopT=0,playAcc=0; // play time for the "Play for 10 minutes" mission
 (function loop(){const t=performance.now();requestAnimationFrame(loop);
+ if(mode==="world"&&!document.hidden){playAcc+=Math.min(200,t-(loopT||t));if(playAcc>=5000){playAcc-=5000;qAdd("time",5,true)}}loopT=t;
  if(mode==="map"){updGS(t);drawMap(t);drawGS(t)}else if(cur.game){cur.game.draw(t);const st=(cur.bonus?"":hearts()+" · ")+cur.game.status()+(cur.bonus||runWon?"":" · "+Math.floor((performance.now()-runStart)/1000)+"s");if(st!==lastS){$("tray").textContent=st;lastS=st}}else{drawWorld(t);const st=hearts()+" · "+L2("Found ","وُجد ")+found.size+"/"+cur.arts.length+(cur.arts.length-found.size===1?" · "+L2("1 left!","واحدة متبقية!"):"")+(runWon?"":" · "+Math.floor((performance.now()-runStart)/1000)+"s");if(st!==lastS){$("tray").textContent=st;lastS=st}}drawFx(t);drawCeleb(t);if(chestEl&&mode==="map"){const x=chestShort();if(chestEl.textContent!==x)chestEl.textContent=x;chestEl.parentNode.classList.toggle("ready",chestAt<=Date.now())}})(0);

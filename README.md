@@ -137,6 +137,21 @@ python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
 python3 tests/e2e/visual_e2e.py   # fonts, icons, overflow, reduced motion
 ```
 
+## Changelog — v5.1 (bug fixes + missing features)
+
+**Bug fixes**
+- A result dialog could pop up over the next screen if you left a level within ~2 s of winning (the timer was not run-scoped). Fixed.
+- On short phones the win dialog could not scroll, so its last buttons could be cut off. Fixed (and the light rays no longer overflow the dialog).
+- Siwa Oasis: following hints on a 5×5 board could run out of moves. A hint plan now always fits in the move limit (extra moves are added only when a hint is used; more than one hint still caps the result at ★★).
+- Siwa's Hint button said "(ad)" even when no ads are available. It now shows 0.
+
+**Missing features (from the engagement plan)**
+- The currency is now called **Coins** everywhere in the interface (saves are unchanged: same balance, same prices).
+- **New daily missions**: *Collect 50 coins*, *Play for 10 minutes* (counted only while a game is on screen, shown in minutes) and *Earn 40+ coins in one level*.
+- **Records** (`core/records.js`, saved as `runs` and `bt`): the 10 best runs by coins and the fastest win for every level. Level rows show your best time, the win dialog says when you set a new fastest time, and Progress lists *Best runs · on this device* (never presented as a global ranking).
+- **Charms** (Shop → Charms): frame colours for the place markers on the map — Gold (free), Lapis 150, Faience 250, Carnelian 300, Amethyst 400 coins. Buy once, switch any time.
+- Backup codes now include records, charms and the equipped frame. Reset clears records and charms, and keeps settings.
+
 ## Changelog — v5.0 (redesign phase 5: settings & progress)
 
 - **Settings** (gear in the map HUD, `js/core/settings.js`): Sound, Vibration (buzz when you lose a heart), Reduce motion (stops dialog animations, confetti, the map reveal and the reward count-up; the system setting is still respected), Language, Map style (Auto / Sunny / Sunset / Night, plus device location), Backup / restore and Reset (two taps). Sound and language left the map HUD; in games the sound button is still one tap away.

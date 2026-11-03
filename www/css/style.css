@@ -463,9 +463,9 @@ h1,h2,#info h2,#iname{font-family:var(--font-display);font-weight:700;letter-spa
 #hintbtn{border-radius:18px;background:var(--panel)}
 
 /* result dialog */
-#done .box{display:flex!important;flex-wrap:wrap;gap:10px;justify-content:center;align-items:stretch;position:relative;overflow:hidden;width:min(400px,calc(100vw - 24px))!important;padding:22px 18px 18px!important}
+#done .box{display:flex!important;flex-wrap:wrap;gap:10px;justify-content:center;align-items:stretch;position:relative;overflow-x:hidden;overflow-y:auto;width:min(400px,calc(100vw - 24px))!important;padding:22px 18px 18px!important}
 #done .box>*{flex:1 1 100%;box-sizing:border-box;position:relative;z-index:1}
-#done .box.is-win:before{content:"";position:absolute;left:50%;top:-120px;width:520px;height:520px;margin-left:-260px;z-index:0;pointer-events:none;
+#done .box.is-win:before{content:"";position:absolute;left:0;right:0;top:-150px;height:420px;z-index:0;pointer-events:none;
  background:repeating-conic-gradient(from 0deg,rgba(242,195,91,.13) 0 9deg,rgba(242,195,91,0) 9deg 22deg);-webkit-mask:radial-gradient(circle,#000 18%,transparent 62%);mask:radial-gradient(circle,#000 18%,transparent 62%);animation:eq-spin 26s linear infinite}
 #done .box.is-lose{background:linear-gradient(180deg,#3A2234,var(--surface) 40%)!important;border-color:rgba(240,103,90,.35)!important}
 @keyframes eq-spin{to{transform:rotate(360deg)}}
@@ -639,3 +639,14 @@ h1,h2,#info h2,#iname{font-family:var(--font-display);font-weight:700;letter-spa
 .pb-row .ico{flex:none;color:var(--gold)}.pb-row span{flex:1 1 auto;color:var(--mut)}.pb-row b{color:var(--txt);text-align:end}
 /* player setting "Reduce motion" (the system setting is handled above) */
 html.reduce-motion *,html.reduce-motion *:before,html.reduce-motion *:after{animation:none!important;transition:none!important}
+
+/* v5.1: charms (marker frames), best runs, fastest-time row */
+.frame-sw{width:44px;height:44px;border-radius:22px;display:grid;place-items:center;background:#f2c14e;border:4px solid var(--fc);box-shadow:0 0 0 2px rgba(0,0,0,.25)}
+.frame-sw .ico{width:20px;height:20px;color:#4a2f0a!important}
+.scard-buy.is-equip{background:var(--raised-2);color:var(--txt);box-shadow:none;border:1px solid var(--line)}
+.runs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.runs li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--surface);font-size:13.5px}
+.runs .rk{flex:none;width:24px;height:24px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:12px;background:var(--raised);color:var(--txt)}
+.runs .rk1{background:var(--btn-primary);color:var(--on-gold)}.runs .rk2{background:#CFD6E4;color:#1b2333}.runs .rk3{background:#C98A5B;color:#2a1a04}
+.runs .rn{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.runs .rt{color:var(--mut);font-variant-numeric:tabular-nums}.runs b{color:var(--gold);min-width:42px;text-align:end}
+.drow.is-best{background:rgba(60,198,168,.12)}.drow.is-best .ico{color:var(--faience)}

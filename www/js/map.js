@@ -99,7 +99,7 @@ function drawMap(t){
   if(rv<1){ctx.save();for(let j=0;j<3;j++){const q=rv*1.4-j*.2;if(q<=0||q>=1)continue;ctx.globalAlpha=1-q;ctx.beginPath();ctx.arc(x,y,17+q*60,0,7);ctx.strokeStyle="#ffe08a";ctx.lineWidth=3*(1-q)+1;ctx.stroke()}ctx.restore()}
   if(!lk&&!dn){const p=1+.22*Math.sin(t/400+i);ctx.beginPath();ctx.arc(x,y+bob,(R+6)*p,0,7);ctx.strokeStyle="rgba(255,224,138,.8)";ctx.lineWidth=2;ctx.stroke()}
   ctx.fillStyle="rgba(0,0,0,.25)";ctx.beginPath();ctx.ellipse(x+2,y+R+4,R*.8,5,0,0,7);ctx.fill();
-  ctx.beginPath();ctx.arc(x,y+bob,R,0,7);ctx.fillStyle=lk?"#8a8f9c":dn?"#6ccf7f":"#f2c14e";ctx.fill();ctx.lineWidth=3;ctx.strokeStyle="#fff7dd";ctx.stroke();
+  ctx.beginPath();ctx.arc(x,y+bob,R,0,7);ctx.fillStyle=lk?"#8a8f9c":dn?"#6ccf7f":"#f2c14e";ctx.fill();ctx.lineWidth=lk?3:frame==="gold"?3:4;ctx.strokeStyle=lk?"#fff7dd":(FRAMES[frame]||FRAMES.gold).c;ctx.stroke();
   if(lk)ctx.globalAlpha=.45;if(st.logoImg&&st.logoImg.complete&&st.logoImg.naturalWidth)mapLogo(st.logoImg,x,y+bob,R);else icon(st,x,y+bob,k*(lk?.9:1));ctx.globalAlpha=1;
   if(lk){const pp=placeProg(i);if(pp){ctx.save();ctx.lineCap="round";ctx.lineWidth=3.5;ctx.strokeStyle="rgba(13,24,39,.7)";ctx.beginPath();ctx.arc(x,y+bob,R+6,0,7);ctx.stroke();if(pp.frac>0){ctx.strokeStyle="#f3c969";ctx.beginPath();ctx.arc(x,y+bob,R+6,-Math.PI/2,-Math.PI/2+Math.PI*2*pp.frac);ctx.stroke()}ctx.restore()}}
   if(lk){ctx.fillStyle="#2a2f40";ctx.fillRect(x+6*k,y+bob+4*k,10*k,8*k);ctx.strokeStyle="#2a2f40";ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+11*k,y+bob+4*k,3.5*k,Math.PI,0);ctx.stroke()}

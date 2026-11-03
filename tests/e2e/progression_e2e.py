@@ -87,7 +87,7 @@ with sync_playwright() as p:
     ev(CLOSE); ev("()=>{exitWorld();SR.gem=[3,3,3,0,0];PR.ul.levels.gem=[1,1,1,0,0];PR.ul.sites=[];PR.cleared={};done.clear();spent=score;render()}")
     check("progress alone does not open giza", not ev("()=>unlocked(1)"))
     ev("()=>select('giza')"); pg.wait_for_timeout(50)
-    check("not enough points: button disabled, shows price", ev("()=>document.getElementById('enter').disabled") and "Needs 100 points" in pg.inner_text("#enter"))
+    check("not enough points: button disabled, shows price", ev("()=>document.getElementById('enter').disabled") and "Needs 100 coins" in pg.inner_text("#enter"))
     check("cannot buy two places ahead", ev("()=>{spent=score-5000;select('alex');render();return document.getElementById('enter').disabled}"))
     ev("()=>select('giza')"); b0 = ev("()=>bal()")
     pg.click("#enter"); pg.wait_for_timeout(50)
@@ -102,7 +102,7 @@ with sync_playwright() as p:
     check("reveal ends by itself", ev("()=>revealAt") is None)
     ev("()=>{select('alex')}"); pg.wait_for_timeout(100)
     if shots: pg.screenshot(path=f"{shots}/map_locked_progress.png")
-    check("locked place info shows its price", "200 points" in pg.inner_text("#idesc"))
+    check("locked place info shows its price", "200 coins" in pg.inner_text("#idesc"))
     # 7. migration of an old save
     old = {"score": 500, "done": ["gem", "giza"], "SR": {"gem": [3, 2, 0, 0, 0], "giza": [1, 1, 1, 0, 0]}, "spent": 10, "inv": {"hint": 2}}
     put_save(old); ev(CLOSE)

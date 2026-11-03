@@ -15,9 +15,12 @@ function bestsBox(){const ar=lang==="ar",nm=s=>ar?s.ar:s.en;let e=null,bp=null,p
  const r=(ic,l,v)=>'<div class="pb-row">'+icn(ic)+'<span>'+l+'</span><b>'+v+'</b></div>';
  return'<div class="pb-box"><h3 class="sh-sub">'+L2("Personal bests","أفضل نتائجك")+' <span>'+L2("on this device","على هذا الجهاز")+'</span></h3>'+
   r("star",L2("Best place","أفضل مكان"),bp?nm(bp.s)+" · "+bp.st+"/15":"—")+r("trophy",L2("★★★ levels","مستويات ★★★"),p3)+
-  r("infinity",L2("Highest Endless","أعلى مستوى لا نهائي"),e?L2("Level ","المستوى ")+e.v+" · "+nm(e.s):L2("Clear a level 5 to unlock","اجتز مستوى 5 لفتحه"))+'</div>'}
+  r("infinity",L2("Highest Endless","أعلى مستوى لا نهائي"),e?L2("Level ","المستوى ")+e.v+" · "+nm(e.s):L2("Clear a level 5 to unlock","اجتز مستوى 5 لفتحه"))+
+  '<h3 class="sh-sub">'+icn("crown")+L2("Best runs","أفضل الجولات")+' <span>'+L2("on this device","على هذا الجهاز")+'</span></h3>'+
+  (Records.runs.length?'<ol class="runs">'+Records.runs.slice(0,5).map((x,k)=>{const s=SITES.find(z=>z.id===x.i),bn=BONUS[x.i];const name=s?nm(s)+" · "+L2("Lv ","م ")+x.l:bn?bn.bonus[ar?1:0]:x.i;
+   return'<li><span class="rk rk'+(k+1)+'">'+(k+1)+'</span><span class="rn">'+name+'</span><span class="rt">'+(x.t?Math.floor(x.t/60)+":"+String(x.t%60).padStart(2,"0"):"")+'</span><b>+'+x.c+'</b></li>'}).join("")+'</ol>':'<p class="sh-sub2">'+L2("Win a level to set your first record.","اربح مستوى لتسجل أول رقم قياسي.")+'</p>')+'</div>'}
 /* Wipe all progress (two-tap confirm in Collection and Settings). Settings (sound, language, vibration, motion) are kept. */
-function resetProgress(){score=0;done.clear();seen.clear();for(const k in prog)delete prog[k];Object.keys(lvl).forEach(k=>delete lvl[k]);ach.clear();streak=0;lastDay="";dailyClaim="";for(const k in SR)delete SR[k];spent=0;inv.hint=5;inv.time=0;inv.boost=0;inv.freeze=0;inv.ward=0;curseOn=false;own.clear();theme="classic";themeMode="auto";qDay="";qIds=[];qp={};qcl={};chestAt=0;loginDay=0;for(const k in ENDL)delete ENDL[k];PR=Progression.fresh();trial=null;trialBack=null;sel=null;}
+function resetProgress(){Records.reset();frame="gold";score=0;done.clear();seen.clear();for(const k in prog)delete prog[k];Object.keys(lvl).forEach(k=>delete lvl[k]);ach.clear();streak=0;lastDay="";dailyClaim="";for(const k in SR)delete SR[k];spent=0;inv.hint=5;inv.time=0;inv.boost=0;inv.freeze=0;inv.ward=0;curseOn=false;own.clear();theme="classic";themeMode="auto";qDay="";qIds=[];qp={};qcl={};chestAt=0;loginDay=0;for(const k in ENDL)delete ENDL[k];PR=Progression.fresh();trial=null;trialBack=null;sel=null;}
 
 /* ---------- UI ---------- */
 function select(id){snd("tap");quipFor("select");sel=SITES.find(s=>s.id===id);if(!seen.has(id)){seen.add(id);score+=Math.round(10*RATE)}render()}
@@ -28,7 +31,7 @@ function exitWorld(){runSeq++;mode="map";if(pendingReveal){revealAt={id:pendingR
 let buyArm=null;
 $("enter").onclick=()=>{if(!sel)return;const i=SITES.indexOf(sel);
  if(!unlocked(i)){if(!pointsMode()||!unlocked(i-1)||bal()<placeCostOf(i))return;
-  if(buyArm!==sel.id){buyArm=sel.id;setRich($("enter"),["@coin"," "+L2("Tap again to spend "+placeCostOf(i)+" points","اضغط مرة أخرى لدفع "+placeCostOf(i)+" نقطة")]);return}
+  if(buyArm!==sel.id){buyArm=sel.id;setRich($("enter"),["@coin"," "+L2("Tap again to spend "+placeCostOf(i)+" coins","اضغط مرة أخرى لدفع "+placeCostOf(i)+" عملة")]);return}
   buyArm=null;if(buyPlace(i))render();return}
  openLevels()};
 $("gback").onclick=exitWorld;$("ginfo").onclick=()=>showIntro(null);
@@ -38,7 +41,7 @@ $("hintbtn").onclick=()=>{if(inv.hint<1){adForHints();return}const rem=cur.arts.
 const unSet=new Set();let unInit=false;
 function checkUnlocks(){SITES.forEach((st,i)=>{if(unlocked(i)&&!unSet.has(st.id)){unSet.add(st.id);if(unInit){toastTx=L2("New place unlocked: ","مكان جديد: ")+(lang==="ar"?st.ar:st.en);toastT=performance.now()+3500;snd("win")}}});unInit=true}
 const chestShort=()=>{const ms=chestAt-Date.now();if(ms<=0)return L2("OPEN","افتح");const m=Math.ceil(ms/60000);return Math.floor(m/60)+"h"+m%60+"m"};
-/* Fill an element with text and vector icons: setRich(el,["Points: 5 ","@flame","3"]).
+/* Fill an element with text and vector icons: setRich(el,["Coins: 5 ","@flame","3"]).
    "@name" → <span class="ico ico-name">, styled in css/style.css (CSS-mask icons take the text colour). */
 function setRich(el,parts){el.textContent="";for(const p of parts){if(typeof p==="string"&&p[0]==="@"&&p.length>1){const i=document.createElement("span");i.className="ico ico-"+p.slice(1);i.setAttribute("aria-hidden","true");el.appendChild(i)}else el.appendChild(document.createTextNode(String(p)))}}
 function render(){checkUnlocks();newQuestDay();checkAch();save();const t=T[lang],ar=lang==="ar";
@@ -52,7 +55,7 @@ function render(){checkUnlocks();newQuestDay();checkAch();save();const t=T[lang]
  setRich($("ankh"),["@ankh"," "+PR.tok]);$("ankh").setAttribute("aria-label",L2("Ankh: ","عنخ: ")+PR.tok);$("ankh").title=L2("Ankh — unlocks levels","عنخ — يفتح المستويات");$("lang").textContent=ar?"English":"العربية";
  const idx=sel?SITES.indexOf(sel):0,lk=!!sel&&!unlocked(idx);
  {const canBuy=lk&&pointsMode()&&unlocked(idx-1)&&bal()>=placeCostOf(idx);if(!sel||buyArm!==sel.id)buyArm=null;
-  if(lk&&buyArm)setRich($("enter"),["@coin"," "+L2("Tap again to spend "+placeCostOf(idx)+" points","اضغط مرة أخرى لدفع "+placeCostOf(idx)+" نقطة")]);
+  if(lk&&buyArm)setRich($("enter"),["@coin"," "+L2("Tap again to spend "+placeCostOf(idx)+" coins","اضغط مرة أخرى لدفع "+placeCostOf(idx)+" عملة")]);
   else if(lk)setRich($("enter"),[canBuy?"@coin":"@lock"," "+lockText(idx)]);else $("enter").textContent=t.enter;$("enter").disabled=lk&&!canBuy}
  const cs=mode==="world"&&cur&&cur.bonus?cur.bonus[ar?1:0]:mode==="world"&&sel?(ar?sel.ar:sel.en):"";setRich($("gtitle"),[...(cur&&cur.bonus?[]:[L2("Lv ","م ")+curLevel,...(curseRun?[" ","@skull"]:[])," · "]),"@coin"," "+bal()+" · "+cs]);$("gtitle").title=cs;setRich($("gback"),["@back"," "+t.back.replace(/^←\s*/,"")]);
  $("gline").textContent="";$("ginfo").style.display=cur&&cur.bonus?"none":"";{const hb=$("hintbtn");hb.textContent="";const e=document.createElement("span");e.className="e";e.dataset.icon="hint";const l=document.createElement("span");l.className="l";setRich(l,inv.hint>0?[String(inv.hint)]:Ads.canReward()?["@play","+"+ADS.rewardedHints]:["0"]);hb.append(e,l);hb.setAttribute("aria-label",L2("Hint","تلميح"))}$("hintbtn").style.display=cur&&cur.game?"none":"";
