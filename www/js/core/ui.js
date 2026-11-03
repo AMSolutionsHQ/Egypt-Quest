@@ -29,7 +29,13 @@ const chestShort=()=>{const ms=chestAt-Date.now();if(ms<=0)return L2("OPEN","ا�
 function setRich(el,parts){el.textContent="";for(const p of parts){if(typeof p==="string"&&p[0]==="@"&&p.length>1){const i=document.createElement("span");i.className="ico ico-"+p.slice(1);i.setAttribute("aria-hidden","true");el.appendChild(i)}else el.appendChild(document.createTextNode(String(p)))}}
 function render(){checkUnlocks();newQuestDay();checkAch();save();const t=T[lang],ar=lang==="ar";
  document.documentElement.lang=lang;document.documentElement.dir=ar?"rtl":"ltr";
- $("title").textContent=t.title;setRich($("score"),["@coin"," "+bal(),...(streak>0?["  ","@flame",String(streak)]:[])]);$("score").setAttribute("aria-label",t.score+": "+bal()+(streak>0?" · "+L2("streak ","تتابع ")+streak:""));$("score").title=t.score;{const nx=nextLocked();setRich($("hint"),[t.hintMap,...(nx>=0?["\n","@lock"," "+L2("Next: ","التالي: ")+(ar?SITES[nx].ar:SITES[nx].en)+" — "+lockText(nx)]:[])])}$("lang").textContent=ar?"English":"العربية";
+ $("title").textContent=t.title;setRich($("score"),["@coin"," "+bal(),...(streak>0?["  ","@flame",String(streak)]:[])]);$("score").setAttribute("aria-label",t.score+": "+bal()+(streak>0?" · "+L2("streak ","تتابع ")+streak:""));$("score").title=t.score;{/* v4.6 phase 2: map hint = how-to tip (first visits only) + next place with a progress bar */
+ const nx=nextLocked(),h=$("hint");h.textContent="";
+ if(done.size<2){const tip=document.createElement("span");tip.className="hint-tip";tip.textContent=t.hintMap;h.appendChild(tip)}
+ if(nx>=0){const row=document.createElement("span");row.className="hint-next";const tx=document.createElement("span");tx.className="hint-tx";setRich(tx,["@lock"," "+L2("Next: ","التالي: ")+(ar?SITES[nx].ar:SITES[nx].en)+" — "+lockText(nx)]);row.appendChild(tx);
+  const pp=placeProg(nx);if(pp){const bar=document.createElement("i");bar.className="hint-bar";const f=document.createElement("b");f.style.width=Math.round(100*Math.min(1,pp.frac||0))+"%";bar.appendChild(f);row.appendChild(bar)}h.appendChild(row)}
+ h.classList.toggle("empty",!h.childNodes.length)}
+ setRich($("ankh"),["@ankh"," "+PR.tok]);$("ankh").setAttribute("aria-label",L2("Ankh: ","عنخ: ")+PR.tok);$("ankh").title=L2("Ankh — unlocks levels","عنخ — يفتح المستويات");$("lang").textContent=ar?"English":"العربية";
  const idx=sel?SITES.indexOf(sel):0,lk=!!sel&&!unlocked(idx);
  {const canBuy=lk&&pointsMode()&&unlocked(idx-1)&&bal()>=placeCostOf(idx);if(!sel||buyArm!==sel.id)buyArm=null;
   if(lk&&buyArm)setRich($("enter"),["@coin"," "+L2("Tap again to spend "+placeCostOf(idx)+" points","اضغط مرة أخرى لدفع "+placeCostOf(idx)+" نقطة")]);
@@ -42,11 +48,17 @@ function render(){checkUnlocks();newQuestDay();checkAch();save();const t=T[lang]
 $("lside").innerHTML="";$("rside").innerHTML="";
 {const dI=getDaily(),dn=dailyClaim===today(),dl=sb("lside","daily",dn?["✓",...(streak>1?[" ","@flame",String(streak)]:[])]:L2("Daily","يومي"),()=>{select(dI);if(unlocked(SITES.findIndex(x=>x.id===dI)))openLevels()},dn?"done":"");
  chestEl=sb("lside","chest",chestShort(),openChest);
- sb("lside","quests",qDone()+"/3",openQuests,qDone()>=3?"done":"");
+ {const ql=sb("lside","quests",qDone()+"/3",openQuests,qDone()>=3?"done":""),n=qIds.filter(id=>(qp[id]||0)>=QDEFS.find(q=>q.id===id).goal&&!qcl[id]).length;
+ if(n){const bd=document.createElement("span");bd.className="sbadge";bd.textContent=n;bd.setAttribute("aria-label",L2(n+" to claim",n+" للاستلام"));ql.parentNode.appendChild(bd)}}
  if(eventMult()>1)sb("lside","event","×2",null,"done")}
 sb("rside","bonus",L2("Bonus","إضافي"),openBonus);sb("rside","book",L2("Book","السجل"),openCollection);sb("rside","shop",L2("Shop","المتجر"),openShop);
 
- const inf=$("info");if(sel&&mode==="map"){inf.style.display="block";$("iname").textContent=ar?sel.ar:sel.en;$("iera").textContent=ar?sel.eraAr:sel.eraEn;setRich($("idesc"),[(ar?sel.dAr:sel.dEn)+"\n","@gamepad"," "+CH[sel.id][ar?1:0]+"\n","@star"," "+starSum(sel.id)+"/15","  ","@ankh"," "+PR.tok,...(lk?["\n","@lock"," "+lockText(idx)]:["\n",placeGoalTxt(idx)])])}else inf.style.display="none";Ads.update()}
+ const inf=$("info");if(sel&&mode==="map"){inf.style.display="block";$("iname").textContent=ar?sel.ar:sel.en;$("iera").textContent=ar?sel.eraAr:sel.eraEn;
+  {const a=$("iart");if(a.dataset.id!==sel.id){a.dataset.id=sel.id;a.innerHTML='<img src="'+placeArt(sel.id)+'" alt="" decoding="async">'}}
+  {const c=$("ichips");c.textContent="";const chip=(parts,cls)=>{const s=document.createElement("span");s.className="chip2"+(cls?" "+cls:"");setRich(s,parts);c.appendChild(s)};
+   const b=SR[sel.id]||[],nDone=[0,1,2,3,4].filter(i=>Progression.levelDone(SR,PR,sel.id,i)).length;
+   chip(["@gamepad"," "+CH[sel.id][ar?1:0]]);chip(["@star"," "+starSum(sel.id)+"/15"],"is-star");if(!lk)chip(["@check"," "+L2(nDone+" of 5 levels",nDone+" من 5 مستويات")],"is-ok")}
+  setRich($("idesc"),[(ar?sel.dAr:sel.dEn),...(lk?["\n","@lock"," "+lockText(idx)]:["\n",placeGoalTxt(idx)])])}else inf.style.display="none";Ads.update()}
 
 /* Rewarded ad: +N hints (offered when you are out of hints, and in the shop) */
 async function adForHints(after){if(!Ads.canReward()){toastTx=L2("Out of hints — get more in the shop","انتهت التلميحات — اشترِ المزيد من المتجر");toastT=performance.now()+2200;return}

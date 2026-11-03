@@ -6,6 +6,8 @@ let PR=Progression.fresh(),pendingReveal=null;
 const unlocked=i=>i===0||(i>0&&!!SITES[i]&&(Progression.placeOpen(PR,SITES,i)||done.has(SITES[i].id)));
 const nextLocked=()=>SITES.findIndex((s,i)=>!unlocked(i));
 /* v4.5: places are bought with points (config PROGRESSION.placeUnlock="points"), in map order */
+/* v4.6: illustration of a place (assets/places/<id>.svg) */
+const placeArt=id=>"assets/places/"+id+".svg";
 const pointsMode=()=>PROGRESSION.placeUnlock==="points";
 const placeCostOf=i=>Progression.placeCost(SITES[i],i);
 const placeProg=i=>!(i>0&&SITES[i-1])?null:pointsMode()?{frac:unlocked(i-1)?Math.min(1,bal()/Math.max(1,placeCostOf(i))):0}:Progression.placeProgress(SR,PR,SITES[i-1],Progression.ruleOf(SITES[i]));

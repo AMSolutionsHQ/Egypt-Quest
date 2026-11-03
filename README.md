@@ -137,6 +137,13 @@ python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
 python3 tests/e2e/visual_e2e.py   # fonts, icons, overflow, reduced motion
 ```
 
+## Changelog — v4.7 (redesign phase 2: map & places)
+
+- **16 place illustrations** (`assets/places/<id>.svg`, 2–6 KB each, drawn in code, offline): shown as a banner on the place card and as the header of the level select. `placeArt(id)` in `core/state.js` returns the path.
+- **Map HUD**: new Ankh counter next to coins; the hint bar shows the how-to tip only on the first visits, then the next place with a progress bar; the Quests button shows a red badge when a mission can be claimed; side buttons moved down so they never cover the hint.
+- **Place card**: illustration banner, chips (game type, stars, levels done), the button now reads *Play*.
+- **Level select** redesigned as a sheet: place art header with back button and Ankh balance, star progress bar, level cards (done ✓ · next level highlighted in gold · unlock with Ankh · locked) with stars on the right, curse mode as a switch, Endless below. All buttons, rules and trials work exactly as before.
+
 ## Changelog — v4.6 (visual foundation — redesign phase 1)
 
 - **Lapis & Gold design system** (`css/style.css`, last block): colour tokens with one meaning each (gold = coins & main actions, faience = Ankh & success, carnelian = hearts, nile = info), 16/24 px radii, raised gold primary buttons (≥48 px), unified dialogs and list rows with a short open animation, solid panels instead of costly background blur.

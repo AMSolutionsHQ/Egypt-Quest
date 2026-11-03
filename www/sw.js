@@ -1,7 +1,7 @@
 /* Offline support for the web build (not used inside the Android app).
    Same-origin files: served from cache, refreshed in the background.
    Bump CACHE when you deploy so old files are dropped. */
-const CACHE="egypt-quest-v4.6.0";
+const CACHE="egypt-quest-v4.7.0";
 const SHELL=["./","./index.html","./css/style.css","./manifest.webmanifest",
  ...["cairo-latin-400","cairo-latin-600","cairo-latin-700","cairo-arabic-400","cairo-arabic-600","cairo-arabic-700","el-messiri-latin-700","el-messiri-arabic-700"].map(f=>"./assets/fonts/"+f+"-normal.woff2")];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});

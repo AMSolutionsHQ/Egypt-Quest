@@ -338,3 +338,93 @@ h1,h2,#info h2,#iname{font-family:var(--font-display);font-weight:700;letter-spa
 #enter .ico,#dbtn .ico,#igo .ico,#lgc .ico{color:var(--on-gold)!important}
 
 @media (prefers-reduced-motion: reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+/* =====================================================================
+   v4.6 redesign phase 2 — map HUD, place card, level select
+   ===================================================================== */
+/* HUD counters */
+#ankh{color:var(--faience);font-weight:700;white-space:nowrap}#ankh .ico{color:var(--faience)}
+#score{color:var(--gold-bright)}
+/* map hint: tip (first visits) + next place with progress */
+#hint{display:flex;flex-direction:column;gap:5px;align-items:stretch;padding:7px 12px;border-radius:16px;white-space:normal}
+#hint.empty{display:none}
+#hint .hint-tip{opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hint .hint-next{display:flex;align-items:center;gap:10px;color:var(--txt);font-weight:600}
+#hint .hint-tx{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:start}
+#hint .hint-bar{flex:0 0 64px;height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+#hint .hint-bar b{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold-deep),var(--gold));transition:width .4s ease}
+/* side rail badge */
+.sbtn{position:relative}
+.sbadge{position:absolute;top:-5px;inset-inline-end:-5px;min-width:20px;height:20px;padding:0 5px;box-sizing:border-box;border-radius:10px;background:var(--carnelian);color:#fff;font:700 11px/20px var(--font-body);text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+
+/* place card: illustration banner + body */
+#info{padding:0!important;overflow:hidden}
+#info:before,#info .info-accent{display:none}
+#iart{height:118px;position:relative;background:#1C3157}
+#iart img{display:block;width:100%;height:100%;object-fit:cover}
+#iart:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,36,65,0) 40%,#162a4c)}
+#info .ibody{padding:0 18px 18px;margin-top:-18px;position:relative}
+#x{position:absolute;top:10px;inset-inline-end:10px;width:36px!important;height:36px!important;border-radius:18px;background:rgba(11,20,38,.62)!important;color:var(--txt)!important;font-size:22px!important;line-height:1!important;display:grid;place-items:center;z-index:2}
+#info h2{margin:0 36px 2px 0!important;font-size:24px!important}
+[dir=rtl] #info h2{margin:0 0 2px 36px!important}
+#info .era{margin-bottom:10px!important;color:var(--mut)!important}
+#ichips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip2{display:inline-flex;align-items:center;gap:5px;min-height:28px;padding:0 10px;border-radius:14px;background:var(--raised);font-size:12.5px;font-weight:600;color:var(--txt)}
+.chip2 .ico{color:var(--gold)}.chip2.is-ok .ico{color:var(--faience)}
+#idesc{margin:0 0 14px!important;font-size:14px!important;line-height:1.55!important}
+#idesc .ico{color:var(--gold)}
+.info-actions,#info .ibody{display:block}
+#enter{min-width:132px;font-size:16px!important;padding:0 20px!important}
+
+/* level select: full sheet with header art */
+#bmenu .box.lv-box{padding:0!important;width:min(440px,calc(100vw - 24px))!important;overflow-x:hidden}
+.lv-head{position:relative;height:190px;background:#1C3157}
+.lv-head img{display:block;width:100%;height:100%;object-fit:cover}
+.lv-head:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,20,38,.5) 0%,rgba(11,20,38,0) 35%,rgba(20,36,65,0) 55%,#172b4e 100%);pointer-events:none}
+.lv-back{position:absolute;top:12px;inset-inline-start:12px;z-index:2;width:42px;height:42px;border-radius:21px;border:0;background:rgba(11,20,38,.62);color:var(--txt);display:grid;place-items:center;padding:0}
+.lv-back .ico{width:20px;height:20px;color:var(--txt)!important}[dir=rtl] .lv-back .ico{transform:scaleX(-1)}
+.lv-ankh{position:absolute;top:16px;inset-inline-end:12px;z-index:2;display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 12px;border-radius:17px;background:rgba(11,20,38,.7);border:1px solid rgba(60,198,168,.5);color:var(--faience);font-weight:700;font-size:14px}
+.lv-ankh .ico{color:var(--faience)!important}
+.lv-title{position:absolute;left:18px;right:18px;bottom:8px;z-index:2;text-align:start}
+.lv-kind{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.lv-title h2{margin:2px 0 0!important;font-size:30px!important;color:var(--txt)!important;line-height:1.1}
+.lv-body{padding:6px 16px 16px;text-align:start}
+.lv-prog{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--surface);font-size:13px;margin:4px 0 8px}
+.lv-prog .ico{color:var(--gold)}.lv-prog-tx{flex:1 1 auto;min-width:0}
+.lv-bar{flex:0 0 72px;height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}.lv-bar b{display:block;height:100%;background:var(--gold);border-radius:3px}
+.lv-body .lvhead{margin:0 0 6px;font-size:13px;color:var(--mut)}
+#bmenu .box .bbtn.lvrow{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 14px;margin:8px 0;border-radius:18px;text-align:start}
+.lvrow .lv-ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.06)}
+.lvrow .lv-ic .ico{width:20px;height:20px}
+.lvrow .lv-tx{flex:1 1 auto;min-width:0;display:flex;flex-direction:column}
+.lvrow .lv-tx b{font-size:16px}.lvrow .lv-tx small{margin-top:1px;font-size:12.5px}
+.lvrow .lv-st{flex:none}
+.lv-stars{color:var(--gold);font-size:18px;letter-spacing:1px}.lv-stars .off{color:#4A5878}
+.lv-cost{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 10px;border-radius:15px;background:rgba(60,198,168,.14);color:var(--faience);font-weight:700;font-size:13px}
+.lv-cost .ico{color:var(--faience)!important}
+#bmenu .box .lvrow.is-done{border-color:rgba(60,198,168,.35)}
+.lvrow.is-done .lv-ic{background:rgba(60,198,168,.16)}.lvrow.is-done .lv-ic .ico{color:var(--faience)}
+#bmenu .box .lvrow.is-next{background:linear-gradient(180deg,var(--raised-2),var(--raised));border:1.5px solid var(--gold);box-shadow:0 0 0 4px rgba(242,195,91,.12),0 10px 24px rgba(0,0,0,.3)}
+.lvrow.is-next .lv-ic{background:var(--btn-primary)}.lvrow.is-next .lv-ic .ico{color:var(--on-gold)!important}.lvrow.is-next .lv-tx b{color:var(--gold)}
+.lvrow.is-open .lv-ic .ico{color:var(--gold)}
+#bmenu .box .lvrow.unlock{border:1px dashed rgba(60,198,168,.65)!important;background:var(--surface)!important}
+.lvrow.unlock .lv-ic{background:rgba(60,198,168,.12)}.lvrow.unlock .lv-ic .ico{color:var(--faience)!important}.lvrow.unlock .lv-tx b{color:var(--txt)!important}
+.lvrow.is-lock .lv-ic .ico{color:var(--mut)}
+#bmenu .box .lvrow.trial{min-height:52px;margin-top:-2px}.lvrow.trial .lv-ic .ico{color:var(--nile)}
+.lvrow.is-endless .lv-ic .ico{color:var(--gold)}
+.lv-foot{display:flex;flex-direction:column;gap:0;margin-top:6px}
+#bmenu .box .bbtn.lv-toggle{display:flex;align-items:center;gap:12px;text-align:start;border-color:rgba(240,103,90,.3)}
+.lv-sw{flex:none;width:38px;height:22px;border-radius:11px;background:rgba(255,255,255,.15);position:relative;transition:background .2s}
+.lv-sw:after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:16px;height:16px;border-radius:8px;background:var(--mut);transition:transform .2s,background .2s}
+.lv-toggle.on .lv-sw{background:rgba(240,103,90,.45)}.lv-toggle.on .lv-sw:after{background:#fff;transform:translateX(16px)}
+[dir=rtl] .lv-toggle.on .lv-sw:after{transform:translateX(-16px)}
+@media(max-width:600px){
+ #bmenu .box.lv-box{width:calc(100vw - 16px)!important;max-height:calc(100dvh - 16px)!important}
+ .lv-head{height:170px}
+ #iart{height:104px}
+}
+/* phase 2 fixes: the two-line hint must clear the side rails; readable title on bright art */
+@media(max-width:600px){#lside,#rside{top:calc(126px + env(safe-area-inset-top,0px))}#hint{max-width:calc(100% - 28px)!important;width:calc(100% - 28px)}}
+.lv-head:after{background:linear-gradient(180deg,rgba(11,20,38,.5) 0%,rgba(11,20,38,0) 30%,rgba(11,20,38,.35) 55%,#172b4e 100%)}
+.lv-title,.lv-title h2{text-shadow:0 2px 10px rgba(0,0,0,.55)}
+.lv-kind{color:var(--gold-bright)}

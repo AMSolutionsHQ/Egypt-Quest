@@ -17,9 +17,9 @@
 <body>
 <!-- ===== UI shell (map HUD, in-game HUD, dialogs) ===== -->
 <canvas id="c"></canvas>
-<div class="hud"><h1 id="title"></h1><div style="display:flex;gap:8px"><span class="pill" id="score"></span><button class="pill" id="mute">🔊</button><button id="lang">العربية</button></div></div>
+<div class="hud"><h1 id="title"></h1><div style="display:flex;gap:8px"><span class="pill" id="score"></span><span class="pill" id="ankh"></span><button class="pill" id="mute">🔊</button><button id="lang">العربية</button></div></div>
 <div id="hint"></div>
-<div id="info"><button id="x">×</button><h2 id="iname"></h2><div class="era" id="iera"></div><p id="idesc"></p><button id="enter"></button><a id="itix" href="#" role="button"></a></div>
+<div id="info"><div id="iart" aria-hidden="true"></div><button id="x" aria-label="Close">×</button><div class="ibody"><h2 id="iname"></h2><div class="era" id="iera"></div><div id="ichips"></div><p id="idesc"></p><button id="enter"></button><a id="itix" href="#" role="button"></a></div></div>
 <div id="lside"></div><div id="rside"></div>
 <div id="gui"><span class="pill" id="gtitle"></span><span style="display:flex;gap:8px"><button class="pill" id="ginfo">ℹ️</button><button class="pill" id="gmute">🔊</button><button class="pill" id="gback"></button></span></div>
 <div id="ghint"><div id="gline"></div><span id="tray"></span></div><div id="gside"><button id="hintbtn" class="sbtn"></button></div>
