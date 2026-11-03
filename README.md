@@ -136,6 +136,12 @@ npm run test:e2e     # browser tests of the progression flows (needs: pip instal
 python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
 ```
 
+## Changelog — v4.5 (places cost points)
+
+- **Places are bought with points**, in map order: price = 100 × position (Giza 100, Alexandria 200 … El Gouna 1,500). Select the next locked place on the map and tap *Unlock for N points* twice (the first tap only asks to confirm). Points come from the same balance as the shop.
+- Stars and levels no longer open places; levels inside a place still use Ankh. Places that were already open stay open.
+- Settings in `config.js → PROGRESSION` (`placeUnlock:"points"`, `placeCostStep:100`); a place can set its own `unlockCost`. Set `placeUnlock:"progress"` to go back to the v4.3 rule.
+
 ## Changelog — v4.4.1 (stability)
 
 - **No fake ads**: the placeholder ad provider runs only on localhost with `?devads=1` and `ADS.test:true`. Without a real ad SDK, no "watch an ad" buttons are shown and no ad reward can be granted (rewards still need the SDK's completed callback).

@@ -138,3 +138,17 @@ test("journey completes when every place is open and the last one meets the rule
   SR.luxor = [2, 2, 0, 0, 0];
   assert.ok(!P.journeyDone(SR, s, SITES));
 });
+
+test("points mode: places are bought in order, never by progress", () => {
+  const c = { placeUnlock: "points", placeCostStep: 100 };
+  const SR = { gem: [3, 3, 3, 3, 3] }, s = P.fresh();
+  assert.deepEqual(P.refreshSites(SR, s, SITES, c), [], "progress alone opens nothing");
+  assert.equal(P.placeCost(SITES[1], 1, c), 100); assert.equal(P.placeCost(SITES[3], 3, c), 300);
+  assert.equal(P.placeCost({ id: "x", unlockCost: 42 }, 3, c), 42, "per-place override");
+  assert.deepEqual(P.buyPlace(s, SITES, 2, false, 9999, c), { ok: false, reason: "blocked", cost: 200 }, "cannot skip ahead");
+  assert.deepEqual(P.buyPlace(s, SITES, 1, true, 99, c), { ok: false, reason: "short", cost: 100 });
+  assert.deepEqual(P.buyPlace(s, SITES, 1, true, 100, c), { ok: true, cost: 100 });
+  assert.ok(P.placeOpen(s, SITES, 1));
+  assert.equal(P.buyPlace(s, SITES, 1, true, 999, c).ok, false, "never charged twice");
+  assert.equal(P.buyPlace(s, SITES, 0, true, 999, c).ok, false, "first place is free");
+});

@@ -17,7 +17,7 @@
    ============================================================ */
 const Progression=(()=>{
  const N=5;
- const DEF={levelCost:[0,1,2,3,3],placeRule:{levels:3,stars:6},tokenTrialMax:2,passageTrialMax:1,passageAfterFails:3};
+ const DEF={levelCost:[0,1,2,3,3],placeRule:{levels:3,stars:6},placeUnlock:"progress",placeCostStep:100,tokenTrialMax:2,passageTrialMax:1,passageAfterFails:3};
  const conf=c=>Object.assign({},DEF,(typeof PROGRESSION!=="undefined"&&PROGRESSION)||{},c||{});
  const arr=(o,id)=>o[id]||(o[id]=new Array(N).fill(0));
  const int=(v,min=0)=>{v=Math.floor(Number(v));return Number.isFinite(v)?Math.max(min,v):min};
@@ -53,8 +53,14 @@ const Progression=(()=>{
   return{levels,needLevels:rule.levels,stars,needStars:rule.stars,ok:levels>=rule.levels&&stars>=rule.stars,
    frac:(Math.min(levels,rule.levels)/Math.max(1,rule.levels)+Math.min(stars,rule.stars)/Math.max(1,rule.stars))/2}}
  const placeOpen=(P,sites,i)=>i===0||(!!sites[i]&&P.ul.sites.includes(sites[i].id));
- /* Unlock every place whose previous place meets its rule. Returns the newly opened ids (in order). */
- function refreshSites(SR,P,sites,c){const out=[];
+ /* placeUnlock:"points" — a place is bought with points, in map order (cost = step × position,
+    or place.unlockCost). The caller spends the points; this only records the unlock. */
+ const placeCost=(place,i,c)=>place&&place.unlockCost!=null?int(place.unlockCost):int(conf(c).placeCostStep)*Math.max(0,i);
+ function buyPlace(P,sites,i,prevOpen,balance,c){if(i<1||!sites[i])return{ok:false,reason:"none"};if(placeOpen(P,sites,i))return{ok:false,reason:"open"};
+  const cost=placeCost(sites[i],i,c);if(!prevOpen)return{ok:false,reason:"blocked",cost};if(!(balance>=cost))return{ok:false,reason:"short",cost};
+  P.ul.sites.push(sites[i].id);return{ok:true,cost}}
+ /* Unlock every place whose previous place meets its rule (progress mode only). Returns the newly opened ids (in order). */
+ function refreshSites(SR,P,sites,c){const out=[];if(conf(c).placeUnlock==="points")return out;
   for(let i=1;i<sites.length;i++){const id=sites[i].id;if(P.ul.sites.includes(id))continue;
    if(placeOpen(P,sites,i-1)&&placeProgress(SR,P,sites[i-1],ruleOf(sites[i],c)).ok){P.ul.sites.push(id);out.push(id)}}
   return out}
@@ -97,6 +103,6 @@ const Progression=(()=>{
  const toSave=P=>({pv:2,tok:P.tok,tokEarned:P.tokEarned,ul:P.ul,cleared:P.cleared,trial:P.trial,fails:P.fails});
 
  return{N,DEF,conf,fresh,levelDone,levelOpen,levelCost,levelStatus,unlockLevel,endlessOpen,canStart,award,recordWin,recordLoss,undoLoss,
-  ruleOf,placeProgress,placeOpen,refreshSites,journeyDone,tokenTrialLevel,passageTrial,applyTrial,migrate,sanitize,toSave};
+  ruleOf,placeProgress,placeOpen,placeCost,buyPlace,refreshSites,journeyDone,tokenTrialLevel,passageTrial,applyTrial,migrate,sanitize,toSave};
 })();
 if(typeof module!=="undefined"&&module.exports)module.exports=Progression;

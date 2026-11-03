@@ -10,7 +10,13 @@ function select(id){snd("tap");quipFor("select");sel=SITES.find(s=>s.id===id);if
 $("x").onclick=()=>{sel=null;render()};
 $("lang").onclick=()=>{lang=lang==="en"?"ar":"en";render()};
 function exitWorld(){runSeq++;mode="map";if(pendingReveal){revealAt={id:pendingReveal,t0:performance.now()};pendingReveal=null}bonusMode=false;ptr.clear();document.body.classList.remove("g");render();if(loginPending)openLogin()}
-$("enter").onclick=()=>{if(!sel)return;if(!unlocked(SITES.indexOf(sel)))return;openLevels()};
+/* Enter: open the level list; on the next locked place (points mode) it buys the place — two taps to confirm */
+let buyArm=null;
+$("enter").onclick=()=>{if(!sel)return;const i=SITES.indexOf(sel);
+ if(!unlocked(i)){if(!pointsMode()||!unlocked(i-1)||bal()<placeCostOf(i))return;
+  if(buyArm!==sel.id){buyArm=sel.id;setRich($("enter"),["@coin"," "+L2("Tap again to spend "+placeCostOf(i)+" points","اضغط مرة أخرى لدفع "+placeCostOf(i)+" نقطة")]);return}
+  buyArm=null;if(buyPlace(i))render();return}
+ openLevels()};
 $("gback").onclick=exitWorld;$("ginfo").onclick=()=>showIntro(null);
 $("hintbtn").onclick=()=>{if(inv.hint<1){adForHints();return}const rem=cur.arts.map((a,i)=>i).filter(i=>!found.has(i));if(!rem.length)return;
  hintIdx=rem[Math.floor(Math.random()*rem.length)];hintUntil=performance.now()+2500;inv.hint--;huntHints++;
@@ -25,7 +31,9 @@ function render(){checkUnlocks();newQuestDay();checkAch();save();const t=T[lang]
  document.documentElement.lang=lang;document.documentElement.dir=ar?"rtl":"ltr";
  $("title").textContent=t.title;setRich($("score"),["@coin"," "+bal(),...(streak>0?["  ","@flame",String(streak)]:[])]);$("score").setAttribute("aria-label",t.score+": "+bal()+(streak>0?" · "+L2("streak ","تتابع ")+streak:""));$("score").title=t.score;{const nx=nextLocked();setRich($("hint"),[t.hintMap,...(nx>=0?["\n","@lock"," "+L2("Next: ","التالي: ")+(ar?SITES[nx].ar:SITES[nx].en)+" — "+lockText(nx)]:[])])}$("lang").textContent=ar?"English":"العربية";
  const idx=sel?SITES.indexOf(sel):0,lk=!!sel&&!unlocked(idx);
- if(lk)setRich($("enter"),["@lock"," "+lockText(idx)]);else $("enter").textContent=t.enter;$("enter").disabled=lk;
+ {const canBuy=lk&&pointsMode()&&unlocked(idx-1)&&bal()>=placeCostOf(idx);if(!sel||buyArm!==sel.id)buyArm=null;
+  if(lk&&buyArm)setRich($("enter"),["@coin"," "+L2("Tap again to spend "+placeCostOf(idx)+" points","اضغط مرة أخرى لدفع "+placeCostOf(idx)+" نقطة")]);
+  else if(lk)setRich($("enter"),[canBuy?"@coin":"@lock"," "+lockText(idx)]);else $("enter").textContent=t.enter;$("enter").disabled=lk&&!canBuy}
  const cs=mode==="world"&&cur&&cur.bonus?cur.bonus[ar?1:0]:mode==="world"&&sel?(ar?sel.ar:sel.en):"";setRich($("gtitle"),[...(cur&&cur.bonus?[]:[L2("Lv ","م ")+curLevel,...(curseRun?[" ","@skull"]:[])," · "]),"@coin"," "+bal()+" · "+cs]);$("gtitle").title=cs;$("gback").textContent=t.back;
  $("gline").textContent="";$("ginfo").style.display=cur&&cur.bonus?"none":"";{const hb=$("hintbtn");hb.textContent="";const e=document.createElement("span");e.className="e";e.dataset.icon="hint";const l=document.createElement("span");l.className="l";setRich(l,inv.hint>0?[String(inv.hint)]:Ads.canReward()?["@play","+"+ADS.rewardedHints]:["0"]);hb.append(e,l);hb.setAttribute("aria-label",L2("Hint","تلميح"))}$("hintbtn").style.display=cur&&cur.game?"none":"";
  if(cur&&mode==="world"&&!cur.game){const n=found.size,tot=cur.arts.length;$("tray").textContent=L2("Found ","وُجد ")+n+"/"+tot}

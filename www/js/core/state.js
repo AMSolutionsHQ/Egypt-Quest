@@ -5,10 +5,17 @@ let lang="en",score=0,sel=null,mode="map",cur=null;const seen=new Set(),done=new
 let PR=Progression.fresh(),pendingReveal=null;
 const unlocked=i=>i===0||(i>0&&!!SITES[i]&&(Progression.placeOpen(PR,SITES,i)||done.has(SITES[i].id)));
 const nextLocked=()=>SITES.findIndex((s,i)=>!unlocked(i));
-const placeProg=i=>i>0&&SITES[i-1]?Progression.placeProgress(SR,PR,SITES[i-1],Progression.ruleOf(SITES[i])):null;
+/* v4.5: places are bought with points (config PROGRESSION.placeUnlock="points"), in map order */
+const pointsMode=()=>PROGRESSION.placeUnlock==="points";
+const placeCostOf=i=>Progression.placeCost(SITES[i],i);
+const placeProg=i=>!(i>0&&SITES[i-1])?null:pointsMode()?{frac:unlocked(i-1)?Math.min(1,bal()/Math.max(1,placeCostOf(i))):0}:Progression.placeProgress(SR,PR,SITES[i-1],Progression.ruleOf(SITES[i]));
 const progTxt=(pp,nm)=>L2("Complete levels 1–"+pp.needLevels+" ("+pp.levels+"/"+pp.needLevels+") and earn "+pp.needStars+"★ ("+Math.min(pp.stars,pp.needStars)+"/"+pp.needStars+") in "+nm[0],
  "أكمل المستويات 1–"+pp.needLevels+" ("+pp.levels+"/"+pp.needLevels+") واجمع "+pp.needStars+"★ ("+Math.min(pp.stars,pp.needStars)+"/"+pp.needStars+") في "+nm[1]);
-const lockText=i=>{const pp=placeProg(i);return pp?progTxt(pp,[SITES[i-1].en,SITES[i-1].ar]):""};
+const lockText=i=>{if(!(i>0&&SITES[i]))return"";if(pointsMode()){const c=placeCostOf(i);return!unlocked(i-1)?L2("Unlock "+SITES[i-1].en+" first","افتح "+SITES[i-1].ar+" أولًا"):bal()>=c?L2("Unlock for "+c+" points","افتحه مقابل "+c+" نقطة"):L2("Needs "+c+" points (you have "+bal()+")","يحتاج "+c+" نقطة (لديك "+bal()+")")}
+ const pp=placeProg(i);return pp?progTxt(pp,[SITES[i-1].en,SITES[i-1].ar]):""};
+/* Spend points to open place i. Returns true when it opened. */
+function buyPlace(i){const r=Progression.buyPlace(PR,SITES,i,unlocked(i-1),bal());if(!r.ok)return false;spent+=r.cost;
+ revealAt={id:SITES[i].id,t0:performance.now()};return true} // render() → checkUnlocks() announces it
 const $=id=>document.getElementById(id);
 const lvl={},ach=new Set();let streak=0,lastDay="",dailyClaim="",dailyDay="",dailyId="",lastWin=0,lastFirst=false,lastDaily=0,lastStars=1,lastLvlUnlock=false,lastBoost=false,huntMiss=0,huntHints=0,lastEvent=false,lastTime=0,lastPar=1,lastPerf=1,lastTs=1,lastSite=null;
 const today=()=>dstr(0);
