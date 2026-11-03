@@ -137,6 +137,16 @@ python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
 python3 tests/e2e/visual_e2e.py   # fonts, icons, overflow, reduced motion
 ```
 
+## Changelog — v4.9 (redesign phase 4: menus)
+
+- Every menu now has a header with a back button and its own colour tint, so they no longer all look the same.
+- **Shop**: tabs *Boosts* / *Map styles*, 2-column cards with an icon, "you have N", description and a gold price button (greyed when you can't afford it, *Owned* badge for one-time items). Map styles show colour swatches for Auto / Classic / Sunset / Night plus the location button.
+- **Daily reward**: 7-day calendar that fits every phone (past days ✓, today gold, day 7 chest), a *Today* reward card, gold Claim.
+- **Daily quests**: streak card (with freezes and the "breaks never cost points" note), mission cards with progress bars and a gold *Claim* button when done, the all-3 bonus card with progress, time until new quests.
+- **Collection**: stats (sites, stars, badges, balance), a badge gallery (gold medallions when earned, dimmed with a lock otherwise), place cards with their illustration, star bar and fact; backup and reset side by side.
+- **Bonus games**: cards with an icon and a play button.
+- Same buttons, prices, rewards and logic as before.
+
 ## Changelog — v4.8 (redesign phase 3: play & results)
 
 - **Level intro**: place illustration, game type, how to play, three rule tiles (hearts · ★★★ rule · time par), Cancel + gold Start side by side. Bonus games and Scribe's Trials get their own icon and label.

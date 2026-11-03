@@ -3,10 +3,11 @@
 function startTrial(kind,id,li){const ks=Object.keys(BONUS),si=Math.max(0,SITES.findIndex(s=>s.id===id));if(!ks.length)return;
  startBonus(ks[(si+(kind==="pass"?1:0)+(PR.trial[kind][id]|0))%ks.length],{kind,id,li})}
 function startBonus(k,tr){runSeq++;trial=tr||null;trialBack=trial?trial.id:null;bonusKey=k;runWon=false;curseRun=false;cur=BONUS[k];showIntro(()=>{$("bmenu").style.display="none";cur.game.start();bonusMode=true;mode="world";document.body.classList.add("g");render()},{bonus:true})}
+const BONUS_IC={rush:"scarab",quiz:"book",catch:"gift"};
 function openBonus(){const ar=lang==="ar",m=$("bmenu");
- m.innerHTML='<div class="box"><h2 style="color:var(--gold);margin:0 0 4px">🎮 '+L2("Bonus games","ألعاب إضافية")+'</h2><p style="margin:0 0 6px;color:var(--mut);font-size:13px">'+L2("Replay anytime to earn more points","العب في أي وقت لتربح نقاطًا أكثر")+'</p>'+
- Object.keys(BONUS).map(k=>'<button class="bbtn" data-k="'+k+'"><b>'+BONUS[k].bonus[ar?1:0]+'</b><small>'+BONUS[k].desc[ar?1:0]+'</small></button>').join("")+
- '<button class="bbtn" data-k="" style="text-align:center">'+L2("Close","إغلاق")+'</button></div>';
+ m.innerHTML='<div class="box sheet bonus-box">'+menuHead("gamepad",L2("Bonus games","ألعاب إضافية"),"bncl")+'<p class="sh-sub2">'+L2("Replay anytime to earn more points","العب في أي وقت لتربح نقاطًا أكثر")+'</p>'+
+ Object.keys(BONUS).map(k=>'<button class="bbtn bcard" data-k="'+k+'"><span class="mc-ic">'+icn(BONUS_IC[k]||"gamepad")+'</span><span class="mc-body"><b>'+BONUS[k].bonus[ar?1:0]+'</b><small>'+BONUS[k].desc[ar?1:0]+'</small></span><span class="bc-play">'+icn("play")+'</span></button>').join("")+'</div>';
+ $("bncl").onclick=()=>{m.style.display="none"};
  m.style.display="flex";m.querySelectorAll(".bbtn").forEach(b=>b.onclick=()=>b.dataset.k?startBonus(b.dataset.k):(m.style.display="none"))}
 
 let bonusMode=false;

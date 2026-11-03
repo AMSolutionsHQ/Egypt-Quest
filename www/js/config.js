@@ -2,7 +2,7 @@
    Egypt Quest — global configuration
    Edit this file to tune the game, the place order and ads.
    ============================================================ */
-const VERSION="4.8.0";
+const VERSION="4.9.0";
 
 /* Order of places on the map. Unlock cost grows with position
    (see need() in core/state.js) unless a place sets `req`.

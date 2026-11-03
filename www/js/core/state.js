@@ -6,6 +6,10 @@ let PR=Progression.fresh(),pendingReveal=null;
 const unlocked=i=>i===0||(i>0&&!!SITES[i]&&(Progression.placeOpen(PR,SITES,i)||done.has(SITES[i].id)));
 const nextLocked=()=>SITES.findIndex((s,i)=>!unlocked(i));
 /* v4.5: places are bought with points (config PROGRESSION.placeUnlock="points"), in map order */
+/* v4.6 phase 4: shared menu pieces — icon span and a sheet header with a back button */
+const icn=n=>'<span class="ico ico-'+n+'" aria-hidden="true"></span>';
+const menuHead=(icon,title,closeId,right)=>'<div class="mh"><button class="mh-back" id="'+closeId+'" aria-label="'+L2("Close","إغلاق")+'">'+icn("back")+'</button><h2>'+(icon?icn(icon):"")+'<span>'+title+'</span></h2>'+(right||"")+'</div>';
+const coinChip=n=>'<span class="mh-chip is-coin">'+icn("coin")+n+'</span>';
 /* v4.6: illustration of a place (assets/places/<id>.svg) */
 const placeArt=id=>"assets/places/"+id+".svg";
 const pointsMode=()=>PROGRESSION.placeUnlock==="points";

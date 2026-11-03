@@ -7,14 +7,27 @@ const ITEMS=[
 {id:"sunset",icon:"🌅",en:"Sunset map",ar:"خريطة الغروب",d:["A warm purple-orange map style","شكل خريطة بألوان الغروب"],cost:150,once:true,buy:()=>{own.add("sunset");theme=themeMode="sunset"}},
 {id:"night",icon:"🌙",en:"Night map",ar:"خريطة الليل",d:["A dark, starry-blue map style","شكل خريطة ليلي"],cost:250,once:true,buy:()=>{own.add("night");theme=themeMode="night"}},
 {id:"lucky",icon:"🍀",en:"Lucky scarab",ar:"الجعران المحظوظ",d:["Golden scarabs appear twice as often on the map","الجعارين الذهبية تظهر ضعف المرات على الخريطة"],cost:300,once:true,buy:()=>{own.add("lucky")}}];
+let shopTab="boost";
+const SHOP_ICON={hint5:"bulb",time:"clock",boost:"bolt",freeze:"snowflake",ward:"shield",sunset:"sparkle",night:"moon",lucky:"scarab"},SHOP_TONE={time:"nile",freeze:"nile",ward:"faience",lucky:"gold",night:"nile"};
+const THEME_SW={auto:"linear-gradient(135deg,#E6C487 0 33%,#E0835A 33% 66%,#24345E 66%)",classic:"linear-gradient(180deg,#1B6CA8,#E6C487)",sunset:"linear-gradient(180deg,#3B2A6B,#F3B36B)",night:"linear-gradient(180deg,#050D1C,#46486A)"};
 function openShop(){const ar=lang==="ar",m=$("bmenu");
- const rows=ITEMS.map(it=>{const ow=it.once&&own.has(it.id),can=!ow&&bal()>=it.cost;return'<button class="bbtn" data-i="'+it.id+'"'+(can?"":" disabled")+'><b>'+it.icon+" "+(ar?it.ar:it.en)+'</b> · '+(ow?"✅ "+L2("Owned","مملوك"):it.cost+" "+L2("pts","نقطة"))+(it.stock?" · "+L2("you have ","لديك ")+it.stock():"")+'<small>'+it.d[ar?1:0]+'</small></button>'}).join("");
- const thb=(k,label)=>'<button class="bbtn" style="width:auto;display:inline-block;margin:4px;text-align:center;'+(themeMode===k?"border-color:#fff":"")+'" data-th="'+k+'">'+label+'</button>';
- const lc=Daylight.where().src,th=thb("auto",L2("Auto (follows the sun)","تلقائي (حسب الشمس)"))+["classic","sunset","night"].filter(k=>k==="classic"||own.has(k)).map(k=>thb(k,THN[k][ar?1:0])).join("")+
-  '<small style="display:block;color:var(--mut);font-size:12px;margin:2px 4px">'+L2("Auto follows the sun where you are: sunny by day, sunset glow at sunrise & sunset, night after dark. Now: ","التلقائي يتبع الشمس في مكانك: مشمس نهارًا، ألوان الغروب وقت الشروق والغروب، ليل بعد المغرب. الآن: ")+THN[Daylight.phase()][ar?1:0]+" · "+
-  (lc==="gps"?L2("precise location","موقع دقيق"):lc==="ip"?L2("approximate location","موقع تقريبي"):L2("Cairo time (location unknown)","توقيت القاهرة (الموقع غير معروف)"))+'</small>'+
-  (lc!=="gps"&&navigator.geolocation?'<button class="bbtn" id="shloc" style="text-align:center"><small style="color:var(--txt)">'+L2("Use my device location for Auto","استخدم موقع جهازي للوضع التلقائي")+'</small></button>':"");
- m.innerHTML='<div class="box" style="max-height:88vh;overflow:auto"><h2 style="color:var(--gold);margin:0 0 4px">🛒 '+L2("Shop","المتجر")+'</h2><p style="margin:0 0 6px;color:var(--mut);font-size:13px">'+L2("Balance: ","الرصيد: ")+bal()+" · "+L2("Stars: ","النجوم: ")+totalStars()+'</p>'+(Ads.canReward()?'<button class="bbtn ad" id="shad"><b>🎬 '+L2("Free: +"+ADS.rewardedHints+" hints","مجانًا: +"+ADS.rewardedHints+" تلميحات")+'</b><small>'+L2("Watch a short ad","شاهد إعلانًا قصيرًا")+'</small></button>':'')+rows+'<div style="margin:8px 0 2px;font-size:13px;color:var(--mut)">'+L2("Map style","شكل الخريطة")+'</div><div>'+th+'</div><button class="bbtn" id="shc" style="text-align:center">'+L2("Close","إغلاق")+'</button></div>';
+ /* v4.6 phase 4: bazaar — tabs (Boosts / Map styles) and a 2-column card grid */
+ const card=it=>{const ow=it.once&&own.has(it.id),can=!ow&&bal()>=it.cost;return'<div class="scard'+(ow?" is-own":"")+'"><div class="scard-top"><span class="scard-ic tone-'+(SHOP_TONE[it.id]||"gold")+'">'+icn(SHOP_ICON[it.id]||"gift")+'</span>'+
+  (it.stock?'<span class="scard-have">'+L2("you have ","لديك ")+it.stock()+'</span>':"")+'</div><b>'+(ar?it.ar:it.en)+'</b><small>'+it.d[ar?1:0]+'</small>'+
+  (ow?'<span class="scard-owned">'+icn("check")+L2("Owned","مملوك")+'</span>':'<button class="scard-buy" data-i="'+it.id+'"'+(can?"":" disabled")+' aria-label="'+L2("Buy for ","اشترِ مقابل ")+it.cost+'">'+icn("coin")+it.cost+'</button>')+'</div>'};
+ const styles=["sunset","night"],grid=items=>'<div class="sgrid">'+items.map(card).join("")+'</div>';
+ const thb=(k,label)=>'<button class="theme-sw'+(themeMode===k?" on":"")+'" data-th="'+k+'" aria-pressed="'+(themeMode===k)+'" style="background:'+THEME_SW[k]+'"><span>'+label+'</span></button>';
+ const lc=Daylight.where().src,th='<div class="theme-row">'+thb("auto",L2("Auto","تلقائي"))+["classic","sunset","night"].filter(k=>k==="classic"||own.has(k)).map(k=>thb(k,THN[k][ar?1:0])).join("")+'</div>'+
+  '<p class="theme-note">'+L2("Auto follows the sun where you are: sunny by day, sunset glow at sunrise & sunset, night after dark. Now: ","التلقائي يتبع الشمس في مكانك: مشمس نهارًا، ألوان الغروب وقت الشروق والغروب، ليل بعد المغرب. الآن: ")+THN[Daylight.phase()][ar?1:0]+" · "+
+  (lc==="gps"?L2("precise location","موقع دقيق"):lc==="ip"?L2("approximate location","موقع تقريبي"):L2("Cairo time (location unknown)","توقيت القاهرة (الموقع غير معروف)"))+'</p>'+
+  (lc!=="gps"&&navigator.geolocation?'<button class="bbtn mini" id="shloc">'+icn("globe")+" "+L2("Use my device location for Auto","استخدم موقع جهازي للوضع التلقائي")+'</button>':"");
+ const tab=(k,label)=>'<button class="stab'+(shopTab===k?" on":"")+'" data-tab="'+k+'" role="tab" aria-selected="'+(shopTab===k)+'">'+label+'</button>';
+ m.innerHTML='<div class="box sheet shop-box">'+menuHead("bag",L2("Shop","المتجر"),"shc",coinChip(bal()))+
+  '<div class="stabs" role="tablist">'+tab("boost",L2("Boosts","معززات"))+tab("styles",L2("Map styles","أشكال الخريطة"))+'</div>'+
+  (shopTab==="boost"?(Ads.canReward()?'<button class="bbtn ad" id="shad"><b>'+icn("video")+" "+L2("Free: +"+ADS.rewardedHints+" hints","مجانًا: +"+ADS.rewardedHints+" تلميحات")+'</b><small>'+L2("Watch a short ad","شاهد إعلانًا قصيرًا")+'</small></button>':"")+grid(ITEMS.filter(i=>!styles.includes(i.id))):
+   '<h3 class="sh-sub">'+L2("Map style","شكل الخريطة")+'</h3>'+th+grid(ITEMS.filter(i=>styles.includes(i.id))))+
+  '<p class="sh-foot">'+L2("Prices are in points you earn by playing. No real money.","الأسعار بالنقاط التي تربحها باللعب. بدون أموال حقيقية.")+' · '+L2("Stars: ","النجوم: ")+totalStars()+'</p></div>';
+ m.querySelectorAll("[data-tab]").forEach(x=>x.onclick=()=>{shopTab=x.dataset.tab;openShop()});
  m.style.display="flex";$("shc").onclick=()=>{m.style.display="none"};if($("shad"))$("shad").onclick=()=>adForHints(openShop);
  m.querySelectorAll("[data-i]").forEach(x=>x.onclick=()=>{const it=ITEMS.find(i=>i.id===x.dataset.i);if(!it||bal()<it.cost||(it.once&&own.has(it.id)))return;spent+=it.cost;it.buy();snd("ok");render();openShop()});
  m.querySelectorAll("[data-th]").forEach(x=>x.onclick=()=>{themeMode=x.dataset.th;if(themeMode==="auto")applyAutoTheme();else theme=themeMode;render();openShop()});
