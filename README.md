@@ -134,7 +134,17 @@ Regenerate icons after editing `resources/`: `npx @capacitor/assets generate --a
 npm test             # unit tests of the progression rules (Node's built-in runner, no dependencies)
 npm run test:e2e     # browser tests of the progression flows (needs: pip install playwright && playwright install chromium)
 python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
+python3 tests/e2e/visual_e2e.py   # fonts, icons, overflow, reduced motion
 ```
+
+## Changelog — v4.6 (visual foundation — redesign phase 1)
+
+- **Lapis & Gold design system** (`css/style.css`, last block): colour tokens with one meaning each (gold = coins & main actions, faience = Ankh & success, carnelian = hearts, nile = info), 16/24 px radii, raised gold primary buttons (≥48 px), unified dialogs and list rows with a short open animation, solid panels instead of costly background blur.
+- **Fonts bundled for offline use**: Cairo (body) and El Messiri (titles), Latin + Arabic subsets (`assets/fonts`, SIL OFL), precached by the service worker.
+- **Icons**: 22 new line icons (`assets/icons/ui-*.svg`). Emoji in menus and dialogs are turned into the matching icon (hint, time, boost, freeze, ward, gift, missions, trophy…) instead of disappearing.
+- Fixes: daily-reward calendar no longer overflows on phones; on-map messages restyled, never wider than the screen, and the mascot waits while a message is shown; dialog titles lost the odd gold first letter.
+- Respects *reduce motion*. No gameplay, save or ads changes.
+- Test: `python3 tests/e2e/visual_e2e.py`.
 
 ## Changelog — v4.5 (places cost points)
 

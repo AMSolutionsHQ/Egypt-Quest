@@ -55,7 +55,15 @@ async function adForHints(after){if(!Ads.canReward()){toastTx=L2("Out of hints �
 
 /* Keep rendered interface text consistent even when older game modules provide emoji labels. */
 const UI_EMOJI=/[\u{1F000}-\u{1FAFF}\u{2705}\u{274C}\u{2764}\u{2B50}\u{2B1C}\u{23F0}-\u{23FA}\u{231A}\u{231B}\u{26A0}\u{26A1}\u{2620}\u{267E}\uFE0F]/gu; // emoji only — ★ ☆ ♥ ♡ ✓ ✗ are kept
-function cleanUiEmoji(root=document.body){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const a=[];while(w.nextNode())a.push(w.currentNode);a.forEach(n=>{const v=n.nodeValue.replace(UI_EMOJI,"");if(v!==n.nodeValue)n.nodeValue=v})}
+/* v4.6: emoji that carry meaning become the matching vector icon (same set as the HUD); the rest are dropped. */
+const EMOJI_ICON={"💡":"bulb","⏱":"clock","⏰":"clock","⌛":"clock","⚡":"bolt","🧊":"snowflake","🛡":"shield","🎬":"video","📺":"video","🔥":"flame","🎁":"gift","📋":"target","🛒":"bag","🛍":"bag","💾":"download",
+ "🎮":"gamepad","☠":"skull","💀":"skull","🎉":"sparkle","🌅":"sparkle","🍀":"sparkle","🏅":"trophy","🏆":"trophy","🗺":"map","💔":"heart","❤":"heart","✅":"check","❌":"close","⬜":"lock","🔒":"lock","⭐":"star","🌙":"moon","♾":"infinity","⚠":"info","📜":"book"};
+const UI_EMOJI_ONE=new RegExp(UI_EMOJI.source,"u");
+function cleanUiEmoji(root=document.body){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const a=[];while(w.nextNode()){const n=w.currentNode;if(UI_EMOJI_ONE.test(n.nodeValue)&&!(n.parentNode&&/^(TEXTAREA|SCRIPT|STYLE)$/.test(n.parentNode.nodeName)))a.push(n)}
+ a.forEach(n=>{const parts=n.nodeValue.split(/([\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\uFE0F])/u);if(!n.parentNode)return;
+  if(!parts.some(p=>EMOJI_ICON[p])){const v=n.nodeValue.replace(UI_EMOJI,"");if(v!==n.nodeValue)n.nodeValue=v;return}
+  const f=document.createDocumentFragment();parts.forEach(p=>{if(!p)return;const ic=EMOJI_ICON[p];if(ic){const s=document.createElement("span");s.className="ico ico-"+ic;s.setAttribute("aria-hidden","true");f.appendChild(s)}else f.appendChild(document.createTextNode(p.replace(UI_EMOJI,"")))});
+  n.parentNode.replaceChild(f,n)})}
 const uiEmojiObserver=new MutationObserver(()=>{uiEmojiObserver.disconnect();cleanUiEmoji();uiEmojiObserver.observe(document.body,{subtree:true,childList:true,characterData:true})});
 uiEmojiObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
 if(window.CanvasRenderingContext2D){const fill=CanvasRenderingContext2D.prototype.fillText,stroke=CanvasRenderingContext2D.prototype.strokeText;CanvasRenderingContext2D.prototype.fillText=function(t,...a){return fill.call(this,String(t).replace(UI_EMOJI,""),...a)};CanvasRenderingContext2D.prototype.strokeText=function(t,...a){return stroke.call(this,String(t).replace(UI_EMOJI,""),...a)}}

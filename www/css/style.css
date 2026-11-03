@@ -246,3 +246,95 @@ button:active{transform:translateY(1px) scale(.98)}
 h1{white-space:nowrap}
 #itix{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 @media(max-width:380px){h1{font-size:0;gap:0}.hud>div{gap:5px}#score{padding-inline:9px}}  /* very narrow phones: logo only, so the score, sound and language buttons fit */
+
+/* =====================================================================
+   v4.6 Visual foundation — "Lapis & Gold" design system (redesign phase 1)
+   Tokens, bundled fonts, components and icons shared by every screen.
+   Later phases restyle individual screens on top of this layer.
+   ===================================================================== */
+/* Fonts (SIL OFL, bundled for offline use — licences in assets/fonts) */
+@font-face{font-family:"Cairo";font-style:normal;font-weight:400;font-display:swap;src:url("../assets/fonts/cairo-arabic-400-normal.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:"Cairo";font-style:normal;font-weight:600;font-display:swap;src:url("../assets/fonts/cairo-arabic-600-normal.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:"Cairo";font-style:normal;font-weight:700;font-display:swap;src:url("../assets/fonts/cairo-arabic-700-normal.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:"Cairo";font-style:normal;font-weight:400;font-display:swap;src:url("../assets/fonts/cairo-latin-400-normal.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Cairo";font-style:normal;font-weight:600;font-display:swap;src:url("../assets/fonts/cairo-latin-600-normal.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Cairo";font-style:normal;font-weight:700;font-display:swap;src:url("../assets/fonts/cairo-latin-700-normal.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"El Messiri";font-style:normal;font-weight:600;font-display:swap;src:url("../assets/fonts/el-messiri-arabic-600-normal.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:"El Messiri";font-style:normal;font-weight:700;font-display:swap;src:url("../assets/fonts/el-messiri-arabic-700-normal.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:"El Messiri";font-style:normal;font-weight:600;font-display:swap;src:url("../assets/fonts/el-messiri-latin-600-normal.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"El Messiri";font-style:normal;font-weight:700;font-display:swap;src:url("../assets/fonts/el-messiri-latin-700-normal.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  /* ground → surface → raised */
+  --bg:#0B1426;--surface:#142441;--raised:#1C3157;--raised-2:#24406F;
+  /* meanings: gold = coins & primary, faience = Ankh & success, carnelian = hearts & danger, nile = info */
+  --gold:#F2C35B;--gold-bright:#FFE3A0;--gold-deep:#C98A2B;--faience:#3CC6A8;--carnelian:#F0675A;--nile:#5B95F2;
+  --txt:#F6EBD2;--mut:#B4AA92;--line:rgba(242,195,91,.22);--line-soft:rgba(255,255,255,.08);
+  --panel:rgba(20,36,65,.94);--panel-solid:#142441;
+  --btn-primary:linear-gradient(180deg,#FFD978,#E9AE3E);--btn-primary-edge:#A66F1C;--on-gold:#2A1A04;
+  --r-sm:12px;--r-md:16px;--r-lg:24px;
+  --shadow:0 18px 44px rgba(0,0,0,.45);
+  --font-body:"Cairo",system-ui,"Segoe UI",Tahoma,sans-serif;--font-display:"El Messiri","Cairo",Georgia,serif;
+}
+html,body,button,textarea{font-family:var(--font-body)}
+body{background:radial-gradient(circle at 50% -20%,#1C3157 0%,#0B1426 55%,#070E1B 100%)}
+h1,h2,#info h2,#iname{font-family:var(--font-display);font-weight:700;letter-spacing:0}
+/* no more gold first letter on dialog titles: the whole title is the accent */
+#bmenu .box h2:first-letter,#done .box h2:first-letter{color:inherit}
+#bmenu .box h2,#done .box h2,#adov .box h2{color:var(--gold)!important}
+
+/* performance: blur behind panels is expensive on low-end Android WebViews → solid translucent panels */
+.pill,#lang,#hint,.sbtn,#ghint,#done,#bmenu{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.pill,#lang,#gback{background-color:var(--panel)!important;border-color:var(--line)!important}
+#hint{background:rgba(11,20,38,.78);border-color:var(--line-soft);color:#D9CFB6}
+
+/* side rails */
+.sbtn{background:var(--panel);border-color:var(--line-soft);border-radius:18px}
+.sbtn .l{color:var(--txt)}
+.sbtn.done{background:rgba(60,198,168,.14);border-color:rgba(60,198,168,.5)}
+.sbtn.ready{box-shadow:0 0 0 1.5px var(--gold),0 0 22px rgba(242,195,91,.45)}
+
+/* place card */
+#info{background:linear-gradient(180deg,#182C50,var(--surface));border-color:var(--line);border-radius:var(--r-lg)}
+#info h2{color:var(--gold)}
+#info p,#idesc{color:#D9CFB6}
+
+/* dialogs */
+#done,#bmenu{background:rgba(5,10,20,.72)}
+#done .box,#bmenu .box,#adov .box{background:linear-gradient(180deg,#182C50,var(--surface) 38%);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+#done[style*="flex"] .box,#bmenu[style*="flex"] .box{animation:eq-pop .22s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes eq-pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+#bmenu .box p,#done .box p{color:#D9CFB6}
+
+/* list rows / buttons inside dialogs */
+#bmenu .box .bbtn,#done .box .bbtn,#adov .box .bbtn{min-height:48px;border-radius:var(--r-md);background:rgba(28,49,87,.72);border:1px solid var(--line-soft);color:var(--txt)}
+#bmenu .box .bbtn:hover,#done .box .bbtn:hover{background:rgba(36,64,111,.9);border-color:var(--line)}
+#bmenu .box .bbtn b,.bbtn b{color:var(--txt)}
+#bmenu .box small,.bbtn small{color:var(--mut)}
+#bmenu .box .bbtn:disabled,#done .box .bbtn:disabled{opacity:.5;background:rgba(20,36,65,.6)}
+.bbtn.unlock{background:rgba(242,195,91,.12)!important;border-color:rgba(242,195,91,.55)!important}.bbtn.unlock b{color:var(--gold)!important}
+.bbtn.trial{border:1px dashed rgba(91,149,242,.6)!important}.bbtn.trial b{color:#A9C8FA!important}
+#bmenu .box .ad{border-color:rgba(91,149,242,.55)!important;background:rgba(91,149,242,.08)!important}
+
+/* primary actions: gold, raised, ≥48px touch height */
+#enter,#dbtn,#igo,#lgc{min-height:48px;border:0!important;border-radius:var(--r-md)!important;background:var(--btn-primary)!important;color:var(--on-gold)!important;font-weight:700!important;box-shadow:0 4px 0 var(--btn-primary-edge),0 10px 22px rgba(233,174,62,.25)!important}
+#enter:active,#dbtn:active,#igo:active,#lgc:active{transform:translateY(3px);box-shadow:0 1px 0 var(--btn-primary-edge)!important}
+#enter:disabled{background:var(--raised)!important;color:var(--mut)!important;box-shadow:none!important}
+#enter .ico{color:currentColor}
+
+/* icons (CSS masks, take the text colour) */
+.ico-bulb{--i:url("../assets/icons/ui-bulb.svg")}.ico-gift{--i:url("../assets/icons/ui-gift.svg")}.ico-bag{--i:url("../assets/icons/ui-bag.svg")}
+.ico-book{--i:url("../assets/icons/ui-book.svg")}.ico-sparkle{--i:url("../assets/icons/ui-sparkle.svg")}.ico-heart{--i:url("../assets/icons/ui-heart.svg")}
+.ico-trophy{--i:url("../assets/icons/ui-trophy.svg")}.ico-target{--i:url("../assets/icons/ui-target.svg")}.ico-map{--i:url("../assets/icons/ui-map.svg")}
+.ico-gear{--i:url("../assets/icons/ui-gear.svg")}.ico-crown{--i:url("../assets/icons/ui-crown.svg")}.ico-scarab{--i:url("../assets/icons/ui-scarab.svg")}
+.ico-retry{--i:url("../assets/icons/ui-retry.svg")}.ico-clock{--i:url("../assets/icons/ui-clock.svg")}.ico-bolt{--i:url("../assets/icons/ui-bolt.svg")}
+.ico-snowflake{--i:url("../assets/icons/ui-snowflake.svg")}.ico-shield{--i:url("../assets/icons/ui-shield.svg")}.ico-globe{--i:url("../assets/icons/ui-globe.svg")}
+.ico-pyramid{--i:url("../assets/icons/ui-pyramid.svg")}.ico-check{--i:url("../assets/icons/ui-check.svg")}.ico-close{--i:url("../assets/icons/ui-close.svg")}
+.ico-info{--i:url("../assets/icons/ui-info.svg")}.ico-download{--i:url("../assets/icons/ui-download.svg")}.ico-moon{--i:url("../assets/icons/ui-moon.svg")}
+.ico-infinity{--i:url("../assets/icons/ui-infinity.svg")}.ico-video{--i:url("../assets/icons/ui-video.svg")}.ico-back{--i:url("../assets/icons/ui-back.svg")}
+/* icon colour by meaning, wherever they appear in dialogs */
+.box .ico{color:var(--gold)}.box .ico-ankh,.box .ico-check{color:var(--faience)}.box .ico-heart,.box .ico-skull{color:var(--carnelian)}
+.box .ico-video,.box .ico-info,.box .ico-snowflake{color:var(--nile)}
+#enter .ico,#dbtn .ico,#igo .ico,#lgc .ico{color:var(--on-gold)!important}
+
+@media (prefers-reduced-motion: reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
