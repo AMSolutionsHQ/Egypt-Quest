@@ -25,8 +25,8 @@ defineBonus({
  const V=makeQuizView({
   bg(){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#16213a");g.addColorStop(1,"#0e1420");ctx.fillStyle=g;ctx.fillRect(0,0,W,H)},
   onEnd(c){if(c>=NEED)finishBonus(c*10);else loseBonus(L2("Only "+c+"/"+NQ+" correct — you need "+NEED+".","أجبت "+c+"/"+NQ+" فقط — تحتاج "+NEED+"."))}});
- return{help:{en:"Answer 5 brand-new questions about Egypt. Get at least 3 right to win (+10 each)",ar:"أجب عن 5 أسئلة جديدة عن مصر. أجب 3 على الأقل صحيحة لتفوز (+10 لكل إجابة)"},
+ return{help:{en:"Answer 5 brand-new questions about Egypt. Get at least 3 right to win (+10 each). 3 in a row = coins ×1.2, 5 in a row = ×1.5",ar:"أجب عن 5 أسئلة جديدة عن مصر. أجب 3 على الأقل صحيحة لتفوز (+10 لكل إجابة). 3 متتالية = العملات ×1.2، و5 متتالية = ×1.5"},
  start(){V.load(QGen.egypt(NQ,4,LOCAL))},
- status(){return V.loading?L2("Loading…","جاري التحميل…"):L2("Question ","السؤال ")+Math.min(V.index+1,NQ)+"/"+NQ+" · ✓ "+V.correct+" · ✗ "+V.errs},
- draw:t=>V.draw(t),tap:(x,y)=>V.tap(x,y)}})()
+ status(){return V.loading?L2("Loading…","جاري التحميل…"):L2("Question ","السؤال ")+Math.min(V.index+1,NQ)+"/"+NQ+" · ✓ "+V.correct+" · ✗ "+V.errs+V.comboTxt()},
+ draw:t=>V.draw(t),tap:(x,y)=>V.tap(x,y),quiz:V}})()
 });

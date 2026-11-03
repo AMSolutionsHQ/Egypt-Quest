@@ -76,12 +76,12 @@ definePlace({
   const sp=ctx.createRadialGradient(W/2,60,10,W/2,60,W*.7);sp.addColorStop(0,"rgba(255,224,138,.28)");sp.addColorStop(1,"rgba(255,224,138,0)");ctx.fillStyle=sp;ctx.fillRect(0,0,W,H);
   if(W>=340){ctx.fillStyle="#0a0a0f";ctx.fillRect(4,0,22,H);ctx.fillRect(W-26,0,22,H);ctx.fillStyle="#d8c8a0";for(let y=((t/40)%26)-26;y<H;y+=26){ctx.fillRect(9,y,12,14);ctx.fillRect(W-21,y,12,14)}}};
  const V=makeQuizView({bg:film,timeLimit:()=>tlim,onEnd:(c,e)=>winGame(e===0?3:e<=1?2:1)});
- return{help:{en:"Egyptian cinema quiz — films from 2015 on! Recognise the stars, films, directors and years, and solve the film jokes. Every game has new questions.",ar:"مسابقة السينما المصرية — أفلام من 2015 وبعدها! اعرف النجوم والأفلام والمخرجين وسنين العرض، وحل نكت السينما. أسئلة جديدة في كل مرة."},
+ return{help:{en:"Egyptian cinema quiz — films from 2015 on! Recognise the stars, films, directors and years, and solve the film jokes. Every game has new questions. 3 right in a row = coins ×1.2, 5 in a row = ×1.5.",ar:"مسابقة السينما المصرية — أفلام من 2015 وبعدها! اعرف النجوم والأفلام والمخرجين وسنين العرض، وحل نكت السينما. أسئلة جديدة في كل مرة. 3 إجابات صحيحة متتالية = العملات ×1.2، و5 متتالية = ×1.5."},
  start(){const x=LV();nq=5+Math.min(x,5);nopt=x<2?3:4;tlim=x>=3?Math.max(8,20-(x-3)*6):0;
   const kinds=x<1?["photo","film"]:x<2?["photo","film","year"]:["photo","film","year","dir"];
   const types=x<1?["joke","actor"]:x<2?["joke","actor","scene"]:["joke","actor","scene","dir","year"];
   const local=LOCAL.filter(q=>types.includes(q.lt)).map(q=>{if(q.opts.length>nopt){const a=q.opts[q.ans],w=QGen.shuf(q.opts.filter((_,i)=>i!==q.ans)).slice(0,nopt-1),o=QGen.shuf([a,...w]);return{...q,opts:o,ans:o.indexOf(a)}}return q});
   V.load(QGen.cinema(nq,nopt,kinds,local,x,MIN_YEAR))},
- status(){return V.loading?L2("Loading…","جاري التحميل…"):L2("Question ","السؤال ")+Math.min(V.index+1,V.count||nq)+"/"+(V.count||nq)+" · "+L2("Mistakes ","الأخطاء ")+V.errs},
- draw:t=>V.draw(t),tap:(x,y)=>V.tap(x,y)}})()
+ status(){return V.loading?L2("Loading…","جاري التحميل…"):L2("Question ","السؤال ")+Math.min(V.index+1,V.count||nq)+"/"+(V.count||nq)+" · "+L2("Mistakes ","الأخطاء ")+V.errs+V.comboTxt()},
+ draw:t=>V.draw(t),tap:(x,y)=>V.tap(x,y),quiz:V}})()
 });

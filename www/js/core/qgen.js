@@ -136,7 +136,7 @@ const QGen=(()=>{
    cfg: {bg(t), timeLimit()→sec|0, onAnswer(ok), onEnd(correct,errs)}
    ============================================================ */
 function makeQuizView(cfg){
- let qs=[],qi=0,picked=-1,wait=false,loading=false,correct=0,errs=0,qEnd=0;
+ let qs=[],qi=0,picked=-1,wait=false,loading=false,correct=0,errs=0,qEnd=0,streak=0,popT=0,popTx="";
  const L=i=>lang==="ar"?1:0;
  function lay(){const q=qs[qi],bw=Math.min(W-60,440);ctx.font="bold 20px system-ui";const ls=wrapT(q.q[L()],bw),ty=178,tb=ty+(ls.length-1)*27;
   let ih=0,iw=0;const n=q.opts.length;
@@ -145,12 +145,15 @@ function makeQuizView(cfg){
   return{bw,ls,ty,top,bh,x:(W-bw)/2,ih,iw,iy}}
  function cover(im,x,y,w,h,r){ctx.save();rr(x,y,w,h,r);ctx.clip();const s=Math.max(w/im.naturalWidth,h/im.naturalHeight),dw=im.naturalWidth*s,dh=im.naturalHeight*s;ctx.drawImage(im,x+(w-dw)/2,y+(h-dh)/2,dw,dh);ctx.restore();ctx.strokeStyle="#e6b84a";ctx.lineWidth=2;rr(x,y,w,h,r);ctx.stroke()}
  function show(){picked=-1;wait=false;const t=cfg.timeLimit?cfg.timeLimit():0;qEnd=t?performance.now()+t*1000:0;if(qs[qi])QGen.markSeen(qs[qi].key)}
- function answer(k){if(picked!==-1||wait)return;picked=k;wait=true;const ok=k===qs[qi].ans;if(ok){correct++;snd("ok")}else{errs++;snd("bad")}cfg.onAnswer&&cfg.onAnswer(ok);
+ function answer(k){if(picked!==-1||wait)return;picked=k;wait=true;const ok=k===qs[qi].ans;if(ok){correct++;snd("ok");streak++;const was=runCombo;if(streak>runComboN){runComboN=streak;runCombo=comboMult(streak)}if(runCombo>was){popT=performance.now();popTx=L2("Combo ×"+runCombo+"!","كومبو ×"+runCombo+"!")}}else{errs++;snd("bad");streak=0}cfg.onAnswer&&cfg.onAnswer(ok);
   later(()=>{qi++;if(qi>=qs.length)cfg.onEnd(correct,errs);else show()},ok?850:1300)}
  return{
-  load(p){loading=true;qs=[];qi=0;correct=0;errs=0;const t0=performance.now();
+  load(p){loading=true;qs=[];qi=0;correct=0;errs=0;streak=0;popT=0;const t0=performance.now();
    p.then(list=>{qs=list;loading=false;if(typeof runStart!=="undefined")runStart+=performance.now()-t0;show()})},
-  get count(){return qs.length||0},get index(){return qi},get correct(){return correct},get errs(){return errs},get loading(){return loading},
+  get count(){return qs.length||0},get streak(){return streak},
+  pick:k=>answer(k),get answer(){return qs[qi]?qs[qi].ans:-1},   // used by tests (same path as a tap)
+  /* status text: "3 in a row · ×1.2" once a streak starts */
+  comboTxt(){return streak>=2?" · "+L2(streak+" in a row",streak+" متتالية")+(runCombo>1?" ×"+runCombo:""):""},get index(){return qi},get correct(){return correct},get errs(){return errs},get loading(){return loading},
   draw(t){cfg.bg(t);ctx.textAlign="center";
    if(loading||!qs[qi]){ctx.fillStyle="#f3ead2";ctx.font="bold 18px system-ui";ctx.fillText(L2("Loading new questions…","جاري تحميل أسئلة جديدة…"),W/2,H/2);
     ctx.strokeStyle="#e6b84a";ctx.lineWidth=4;ctx.beginPath();ctx.arc(W/2,H/2+40,16,t/200,t/200+4.5);ctx.stroke();return}
@@ -159,6 +162,7 @@ function makeQuizView(cfg){
    ctx.font="bold 20px system-ui";ctx.fillStyle="#fff";g.ls.forEach((l,k)=>ctx.fillText(l,W/2,g.ty+k*27));
    if(q.image&&g.ih)cover(q.image,(W-g.iw)/2,g.iy,g.iw,g.ih,12);
    if(qEnd&&picked<0){const left=Math.max(0,(qEnd-t)/(cfg.timeLimit()*1000));ctx.fillStyle="rgba(255,255,255,.18)";ctx.fillRect(g.x,g.top-12,g.bw,5);ctx.fillStyle=left<.3?"#d9534f":"#e6b84a";ctx.fillRect(g.x,g.top-12,g.bw*left,5);if(left<=0&&!wait)answer(-2)}
+   if(popT&&t-popT<1100){const k=(t-popT)/1100;ctx.save();ctx.globalAlpha=Math.min(1,(1-k)*2);ctx.font="700 22px Cairo, system-ui";ctx.fillStyle="#F2C35B";ctx.strokeStyle="rgba(11,20,38,.9)";ctx.lineWidth=5;ctx.lineJoin="round";const yy=g.top-26-k*22;ctx.strokeText(popTx,W/2,yy);ctx.fillText(popTx,W/2,yy);ctx.restore()}
    q.opts.forEach((o,k)=>{const y=g.top+k*(g.bh+10);let c="#2a2a45";if(picked!==-1){if(k===q.ans)c="#2e7d4f";else if(k===picked)c="#a33a3a"}
     ctx.fillStyle=c;rr(g.x,y,g.bw,g.bh,14);ctx.fill();ctx.strokeStyle="#e6b84a";ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle="#fff";let fs=17;ctx.font=fs+"px system-ui";const tx=o[ar?1:0];while(ctx.measureText(tx).width>g.bw-20&&fs>11){fs--;ctx.font=fs+"px system-ui"}ctx.fillText(tx,W/2,y+g.bh/2+6)})},

@@ -1,6 +1,6 @@
 {
   "name": "egypt-quest",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "private": true,
   "description": "Egypt Quest — map adventure with a mini-game at every site. Web (PWA) + Android (Capacitor).",
   "scripts": {

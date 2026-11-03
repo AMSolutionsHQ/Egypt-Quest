@@ -137,6 +137,10 @@ python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
 python3 tests/e2e/visual_e2e.py   # fonts, icons, overflow, reduced motion
 ```
 
+## Changelog — v5.2 (quiz combo)
+
+- **Combo multiplier** in the two quiz games (El Gouna Film Festival and Pharaoh Quiz): 3 correct answers in a row → coins ×1.2, 5 in a row → ×1.5. The best streak of the run counts, so a later mistake resets the streak but keeps the multiplier already earned. The status bar shows "3 in a row · ×1.2", a "Combo ×1.2!" pops up when the multiplier rises, and the result names it. Stars, Ankh, lives and unlock rules are unchanged. Tune it in `COMBO` (`core/state.js`).
+
 ## Changelog — v5.1 (bug fixes + missing features)
 
 **Bug fixes**

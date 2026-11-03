@@ -2,7 +2,7 @@
    kind "tok" = +1 Ankh, kind "pass" = mark level li passed at 0★. No ads are offered during or after it. */
 function startTrial(kind,id,li){const ks=Object.keys(BONUS),si=Math.max(0,SITES.findIndex(s=>s.id===id));if(!ks.length)return;
  startBonus(ks[(si+(kind==="pass"?1:0)+(PR.trial[kind][id]|0))%ks.length],{kind,id,li})}
-function startBonus(k,tr){runSeq++;trial=tr||null;trialBack=trial?trial.id:null;bonusKey=k;runWon=false;curseRun=false;cur=BONUS[k];showIntro(()=>{$("bmenu").style.display="none";cur.game.start();bonusMode=true;mode="world";document.body.classList.add("g");render()},{bonus:true})}
+function startBonus(k,tr){runSeq++;runCombo=1;runComboN=0;trial=tr||null;trialBack=trial?trial.id:null;bonusKey=k;runWon=false;curseRun=false;cur=BONUS[k];showIntro(()=>{$("bmenu").style.display="none";cur.game.start();bonusMode=true;mode="world";document.body.classList.add("g");render()},{bonus:true})}
 const BONUS_IC={rush:"scarab",quiz:"book",catch:"gift"};
 function openBonus(){const ar=lang==="ar",m=$("bmenu");
  m.innerHTML='<div class="box sheet bonus-box">'+menuHead("gamepad",L2("Bonus games","ألعاب إضافية"),"bncl")+'<p class="sh-sub2">'+L2("Replay anytime to earn more coins","العب في أي وقت لتربح عملات أكثر")+'</p>'+
@@ -16,7 +16,7 @@ function finishBonus(p){doneMode="win";doneArt("trophy");setDoneBtns("dbtn");$("
   snd("win");confetti();qAdd("bonus",1);Ads.countFinish();lastWin=0;render();$("dad").style.display="none";$("dh").textContent=L2("Trial passed!","نجحت في الاختبار!");
   $("dp").textContent=!ok?L2("This trial was already used.","تم استخدام هذا الاختبار من قبل."):t.kind==="tok"?"☥ "+L2("+1 Ankh · balance "+PR.tok,"+1 عنخ · الرصيد "+PR.tok):t.li>=4?L2("Level 5 passed — Endless is open.","اجتزت المستوى 5 — الوضع اللانهائي مفتوح."):L2("Level "+(t.li+1)+" passed — you can now unlock level "+(t.li+2)+".","اجتزت المستوى "+(t.li+1)+" — يمكنك الآن فتح المستوى "+(t.li+2)+".");
   $("dbtn").textContent=L2("Back to levels","العودة للمستويات");$("done").style.display="flex";return}
- p=Math.round(p*eventMult()*RATE);snd("win");confetti();qAdd("bonus",1);qAdd("coins",p);Records.add({i:bonusKey,l:0,c:p,t:0,s:0});score+=p;lastWin=p;Ads.countFinish();render();$("dh").textContent=L2("Great job!","أحسنت!");$("dp").textContent=L2("You earned +"+p+" coins","ربحت +"+p+" عملة");$("dbtn").textContent=L2("Back to map","العودة للخريطة");offerDouble();$("done").style.display="flex"}
+ const cm=runCombo,cn=runComboN;p=Math.round(p*eventMult()*RATE*cm);snd("win");confetti();qAdd("bonus",1);qAdd("coins",p);Records.add({i:bonusKey,l:0,c:p,t:0,s:0});score+=p;lastWin=p;Ads.countFinish();render();$("dh").textContent=L2("Great job!","أحسنت!");$("dp").textContent=L2("You earned +"+p+" coins","ربحت +"+p+" عملة")+(cm>1?" · "+L2("combo ×"+cm+" ("+cn+" in a row)","كومبو ×"+cm+" ("+cn+" متتالية)"):"");$("dbtn").textContent=L2("Back to map","العودة للخريطة");offerDouble();$("done").style.display="flex"}
 const wrapT=(tx,w)=>{const ws=tx.split(" "),ls=[];let c="";ws.forEach(x=>{const n=c?c+" "+x:x;if(ctx.measureText(n).width>w&&c){ls.push(c);c=x}else c=n});if(c)ls.push(c);return ls};
 
 

@@ -55,6 +55,11 @@ const later=(fn,ms)=>{const s=runSeq;return setTimeout(()=>{if(s===runSeq&&mode=
 /* Lives: every place run starts with ❤❤❤ (one less on level 5+). A mistake costs a heart; 0 = level lost. */
 let lives=3,maxLives=3,runLost=false,hurtT=0,contUsed=false,loseT=0,pendingWin=0,doneMode="win",bonusKey="";
 const hearts=()=>"♥".repeat(Math.max(0,lives))+"♡".repeat(Math.max(0,maxLives-lives)); // text hearts (not emoji)
+/* v5.2 quiz combo: correct answers in a row raise the coin multiplier of the run (best streak counts)
+   3 in a row → ×1.2 · 5 in a row → ×1.5. Only the quiz games (El Gouna, Pharaoh Quiz). Stars and Ankh are unchanged. */
+const COMBO=[[5,1.5],[3,1.2]];
+const comboMult=n=>{for(const[k,m]of COMBO)if(n>=k)return m;return 1};
+let runCombo=1,runComboN=0,lastCombo=1,lastComboN=0;
 let lastBestT=false,lastLostHeart=false,lastNewUnlock=false,lastTok=0,lastPrev=0,nextAct="play";
 /* Scribe's Trial run ({kind,id,li}) and where to return after it; map reveal of a newly opened place */
 let trial=null,trialBack=null,revealAt=null;
