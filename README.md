@@ -137,6 +137,13 @@ python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
 python3 tests/e2e/visual_e2e.py   # fonts, icons, overflow, reduced motion
 ```
 
+## Changelog — v5.0 (redesign phase 5: settings & progress)
+
+- **Settings** (gear in the map HUD, `js/core/settings.js`): Sound, Vibration (buzz when you lose a heart), Reduce motion (stops dialog animations, confetti, the map reveal and the reward count-up; the system setting is still respected), Language, Map style (Auto / Sunny / Sunset / Night, plus device location), Backup / restore and Reset (two taps). Sound and language left the map HUD; in games the sound button is still one tap away.
+- Settings are saved: `vibOn`, `motionOff` and now also the **language** (it used to reset to English on every start). Older saves get the defaults.
+- **Progress** replaces *Book* on the side rail: *Your journey* with stats, **personal bests** from data the game already keeps (best place, ★★★ levels, highest Endless level — labelled "on this device", not a global ranking), badge gallery and place facts.
+- Reset is one shared function (`resetProgress()` in `core/ui.js`) used by Progress and Settings; it keeps your settings.
+
 ## Changelog — v4.9 (redesign phase 4: menus)
 
 - Every menu now has a header with a back button and its own colour tint, so they no longer all look the same.

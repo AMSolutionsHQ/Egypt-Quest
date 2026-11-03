@@ -615,3 +615,27 @@ h1,h2,#info h2,#iname{font-family:var(--font-display);font-weight:700;letter-spa
 /* bonus */
 .bc-play{flex:none;width:38px;height:38px;border-radius:19px;display:grid;place-items:center;background:var(--btn-primary)}.bc-play .ico{color:var(--on-gold)!important;width:18px;height:18px}
 @media(max-width:360px){.sgrid{grid-template-columns:1fr}.ach-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.jstats{grid-template-columns:repeat(2,minmax(0,1fr))}.theme-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* =====================================================================
+   v4.6 redesign phase 5 — Settings (gear in the HUD) and Progress
+   ===================================================================== */
+.ico-speaker{--i:url("../assets/icons/ui-speaker.svg")}
+/* sound and language now live in Settings (sound stays one tap away inside games) */
+.hud #mute,.hud #lang{display:none!important}
+#gear{display:grid;place-items:center;width:40px;height:40px;padding:0;border-radius:20px!important}
+#gear .ico{width:20px;height:20px;color:var(--txt)}
+.sbtn .e[data-icon="progress"]{background-image:url("../assets/icons/ui-crown.svg")}
+.box.settings-box{background:linear-gradient(180deg,#1C2B45,var(--surface) 30%)!important}
+.st-group{border-radius:18px;overflow:hidden;background:var(--surface)}
+#bmenu .box .st-group .bbtn.st-row{margin:0!important;border-radius:0!important;border:0!important;border-bottom:1px solid var(--line-soft)!important;background:transparent!important;min-height:58px}
+#bmenu .box .st-group .bbtn.st-row:last-child{border-bottom:0!important}
+.st-row>.ico{width:22px;height:22px;flex:none}
+.st-row .lv-tx{flex:1 1 auto}
+.st-row.on .lv-sw{background:rgba(60,198,168,.55)}.st-row.on .lv-sw:after{background:#fff}
+.settings-box .stabs .stab[lang=ar]{font-size:15px}
+/* personal bests (Progress) */
+.pb-box{margin:4px 0 6px}
+.pb-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:var(--surface);margin:6px 0;font-size:13.5px}
+.pb-row .ico{flex:none;color:var(--gold)}.pb-row span{flex:1 1 auto;color:var(--mut)}.pb-row b{color:var(--txt);text-align:end}
+/* player setting "Reduce motion" (the system setting is handled above) */
+html.reduce-motion *,html.reduce-motion *:before,html.reduce-motion *:after{animation:none!important;transition:none!important}

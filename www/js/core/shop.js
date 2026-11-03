@@ -17,7 +17,7 @@ function openShop(){const ar=lang==="ar",m=$("bmenu");
   (ow?'<span class="scard-owned">'+icn("check")+L2("Owned","مملوك")+'</span>':'<button class="scard-buy" data-i="'+it.id+'"'+(can?"":" disabled")+' aria-label="'+L2("Buy for ","اشترِ مقابل ")+it.cost+'">'+icn("coin")+it.cost+'</button>')+'</div>'};
  const styles=["sunset","night"],grid=items=>'<div class="sgrid">'+items.map(card).join("")+'</div>';
  const thb=(k,label)=>'<button class="theme-sw'+(themeMode===k?" on":"")+'" data-th="'+k+'" aria-pressed="'+(themeMode===k)+'" style="background:'+THEME_SW[k]+'"><span>'+label+'</span></button>';
- const lc=Daylight.where().src,th='<div class="theme-row">'+thb("auto",L2("Auto","تلقائي"))+["classic","sunset","night"].filter(k=>k==="classic"||own.has(k)).map(k=>thb(k,THN[k][ar?1:0])).join("")+'</div>'+
+ const lc=Daylight.where().src,th='<div class="theme-row">'+thb("auto",L2("Auto","تلقائي"))+["classic","sunset","night"].filter(k=>k==="classic"||own.has(k)).map(k=>thb(k,THN_SHORT[k][ar?1:0])).join("")+'</div>'+
   '<p class="theme-note">'+L2("Auto follows the sun where you are: sunny by day, sunset glow at sunrise & sunset, night after dark. Now: ","التلقائي يتبع الشمس في مكانك: مشمس نهارًا، ألوان الغروب وقت الشروق والغروب، ليل بعد المغرب. الآن: ")+THN[Daylight.phase()][ar?1:0]+" · "+
   (lc==="gps"?L2("precise location","موقع دقيق"):lc==="ip"?L2("approximate location","موقع تقريبي"):L2("Cairo time (location unknown)","توقيت القاهرة (الموقع غير معروف)"))+'</p>'+
   (lc!=="gps"&&navigator.geolocation?'<button class="bbtn mini" id="shloc">'+icn("globe")+" "+L2("Use my device location for Auto","استخدم موقع جهازي للوضع التلقائي")+'</button>':"");

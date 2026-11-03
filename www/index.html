@@ -17,7 +17,7 @@
 <body>
 <!-- ===== UI shell (map HUD, in-game HUD, dialogs) ===== -->
 <canvas id="c"></canvas>
-<div class="hud"><h1 id="title"></h1><div style="display:flex;gap:8px"><span class="pill" id="score"></span><span class="pill" id="ankh"></span><button class="pill" id="mute">🔊</button><button id="lang">العربية</button></div></div>
+<div class="hud"><h1 id="title"></h1><div style="display:flex;gap:8px"><span class="pill" id="score"></span><span class="pill" id="ankh"></span><button class="pill" id="mute">🔊</button><button id="lang">العربية</button><button class="pill icon-btn" id="gear" aria-label="Settings"><span class="ico ico-gear" aria-hidden="true"></span></button></div></div>
 <div id="hint"></div>
 <div id="info"><div id="iart" aria-hidden="true"></div><button id="x" aria-label="Close">×</button><div class="ibody"><h2 id="iname"></h2><div class="era" id="iera"></div><div id="ichips"></div><p id="idesc"></p><button id="enter"></button><a id="itix" href="#" role="button"></a></div></div>
 <div id="lside"></div><div id="rside"></div>
@@ -51,6 +51,7 @@
 <script src="js/core/progress.js"></script>
 <script src="js/core/bonus.js"></script>
 <script src="js/core/ui.js"></script>
+<script src="js/core/settings.js"></script>
 <script src="js/core/input.js"></script>
 <script src="js/ads.js"></script>
 <script src="js/app.js"></script>

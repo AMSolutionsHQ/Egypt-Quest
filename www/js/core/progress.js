@@ -65,7 +65,7 @@ function setDoneBtns(primary){["dnext","dre","dbtn"].forEach(id=>$(id).classList
 const dRow=(icon,txt,cls)=>'<div class="drow'+(cls?" "+cls:"")+'">'+dIc(icon)+'<span class="drow-tx">'+txt+'</span></div>';
 function dpAppend(icon,txt){const d=document.createElement("div");d.className="drow";d.innerHTML=dIc(icon)+'<span class="drow-tx"></span>';d.lastChild.textContent=txt;$("dp").appendChild(d)}
 /* count the reward numbers up (skipped with reduced motion) */
-function countUp(){if(matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;$("dp").querySelectorAll(".dnum[data-to]").forEach(el=>{const to=+el.dataset.to,t0=performance.now();if(!(to>1))return;
+function countUp(){if(motionReduced())return;$("dp").querySelectorAll(".dnum[data-to]").forEach(el=>{const to=+el.dataset.to,t0=performance.now();if(!(to>1))return;
  const step=t=>{const k=Math.min(1,(t-t0)/650),v=Math.round(to*(1-Math.pow(1-k,3)));el.textContent="+"+v;if(k<1&&el.isConnected)requestAnimationFrame(step)};el.textContent="+0";requestAnimationFrame(step)})}
 function fallbackDone(){doneArt("stars",lastStars||1);$("dh").textContent=L2("Level complete!","اكتمل المستوى!");$("dp").textContent="";setRich($("dnext"),["@play"," "+L2("Next level","المستوى التالي")]);setRich($("dre"),["@retry"," "+L2("Retry","إعادة")]);setRich($("dbtn"),["@map"," "+L2("Back to map","العودة للخريطة")]);$("dnext").style.display=$("dre").style.display="block";$("dad").style.display="none";setDoneBtns("dnext");$("done").style.display="flex"}
 function showDone(){doneMode="win";if(!sel&&lastSite)sel=lastSite;const t=T[lang],i=SITES.indexOf(lastSite||sel),nx=nextInfo();nextAct=nx.act;
@@ -107,7 +107,7 @@ $("dad").onclick=async()=>{const b=$("dad");if(doneMode==="lose"){continueRun();
 
 /* ---------- LOSING ---------- */
 /* A mistake: called automatically for snd("bad") during a place run (see audio.js). */
-function hurt(){if(runWon||runLost||mode!=="world"||!cur||cur.bonus)return;lives--;hurtT=performance.now();if(navigator.vibrate)try{navigator.vibrate([40,40,80])}catch(e){}
+function hurt(){if(runWon||runLost||mode!=="world"||!cur||cur.bonus)return;lives--;hurtT=performance.now();if(vibOn&&navigator.vibrate)try{navigator.vibrate([40,40,80])}catch(e){}
  if(lives<=0)loseGame(L2("You ran out of hearts.","نفدت قلوبك."))}
 /* End the run as a loss (games may also call this directly, e.g. out of moves). */
 function loseGame(reason){if(runWon||runLost||mode!=="world")return;runLost=true;if(sel&&!cur.bonus&&curLevel<=5)Progression.recordLoss(PR,sel.id,curLevel-1);runWon=true;loseT=performance.now();lives=Math.max(0,lives);Ads.countFinish();

@@ -33,7 +33,8 @@ const SaveCheck=(()=>{
    inv:Object.fromEntries(Object.keys(INV).map(k=>[k,int(inv[k],INV[k])])),
    theme:THEMES.includes(d.theme)?d.theme:"classic",
    qIds:strs(d.qIds,3),qp:mapOf(d.qp,x=>{const n=int(x,-1);return n>=0?n:undefined}),qcl:mapOf(d.qcl,x=>x?1:undefined)});
-  if("themeMode" in d&&!MODES.includes(d.themeMode))delete out.themeMode;   // load() then picks the default
+  if("themeMode" in d&&!MODES.includes(d.themeMode))delete out.themeMode;
+  if("vibOn" in d)out.vibOn=d.vibOn!==false;if("motionOff" in d)out.motionOff=d.motionOff===true;if("lang" in d&&d.lang!=="en"&&d.lang!=="ar")delete out.lang;   // settings (v4.6): only normalised when present   // load() then picks the default
   return out}
  /* Parse a stored string; null if it is missing or not a JSON object */
  function parse(s){if(typeof s!=="string"||!s)return null;try{const d=JSON.parse(s);return isObj(d)?d:null}catch(e){return null}}

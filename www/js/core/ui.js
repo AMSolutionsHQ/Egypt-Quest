@@ -2,13 +2,22 @@ function openCollection(){const ar=lang==="ar",m=$("bmenu");let n=0;
  /* v4.6 phase 4: journey — stats, place cards with art + fact, badge gallery */
  const rows=SITES.map((s,i)=>{const ok=done.has(s.id),st=starSum(s.id),open=unlocked(i);if(ok)n++;return'<div class="bbtn collection-row'+(ok?" is-done":"")+(open?"":" is-locked")+'"><img class="cr-art" src="'+placeArt(s.id)+'" alt="" loading="lazy" decoding="async"><span class="cr-body"><b><span class="status-icon '+(ok?'is-done':'is-locked')+'" aria-hidden="true"></span>'+(ar?s.ar:s.en)+'</b><span class="cr-stars">'+icn("star")+st+'/15<i class="cr-bar"><b style="width:'+Math.round(100*st/15)+'%"></b></i></span><small>'+(ok?FACTS[s.id][ar?1:0]:L2("Finish this site's challenge to reveal a fact","أكمل تحدي هذا الموقع لتكشف معلومة"))+'</small></span></div>'}).join("");
  const stat=(ic,v,l)=>'<div class="jstat">'+icn(ic)+'<b>'+v+'</b><small>'+l+'</small></div>';
- m.innerHTML='<div class="box sheet collection-box">'+menuHead("book",L2("Collection","المجموعة"),"cl")+
+ m.innerHTML='<div class="box sheet collection-box">'+menuHead("crown",L2("Your journey","رحلتك"),"cl")+
   '<div class="jstats">'+stat("pyramid",n+"/"+SITES.length,L2("Sites completed","المواقع المكتملة"))+stat("star",totalStars(),L2("Stars","النجوم"))+stat("trophy",ach.size+"/"+ACH.length,L2("Badges","الأوسمة"))+stat("coin",bal(),L2("Balance","الرصيد"))+'</div>'+
-  '<p class="save-note">'+icn("check")+" "+L2("Progress saves automatically on this device","يُحفظ تقدمك تلقائيًا على هذا الجهاز")+" · "+L2("Earned ","المكتسب ")+score+'</p>'+
+  bestsBox()+'<p class="save-note">'+icn("check")+" "+L2("Progress saves automatically on this device","يُحفظ تقدمك تلقائيًا على هذا الجهاز")+" · "+L2("Earned ","المكتسب ")+score+'</p>'+
   achBox()+'<h3 class="sh-sub">'+L2("Places & facts","الأماكن والمعلومات")+'</h3>'+rows+
   '<div class="col-actions"><button class="bbtn" id="bk">'+icn("download")+" "+L2("Backup / restore progress","نسخ احتياطي / استعادة التقدم")+'</button><button class="bbtn danger" id="rst">'+L2("Reset progress","إعادة ضبط التقدم")+'</button></div></div>';
  m.style.display="flex";$("cl").onclick=()=>{m.style.display="none"};$("bk").onclick=openBackup;let armed=false;
- $("rst").onclick=()=>{if(!armed){armed=true;$("rst").textContent=L2("Tap again to confirm","اضغط مرة أخرى للتأكيد");return}score=0;done.clear();seen.clear();for(const k in prog)delete prog[k];Object.keys(lvl).forEach(k=>delete lvl[k]);ach.clear();streak=0;lastDay="";dailyClaim="";for(const k in SR)delete SR[k];spent=0;inv.hint=5;inv.time=0;inv.boost=0;inv.freeze=0;inv.ward=0;curseOn=false;own.clear();theme="classic";themeMode="auto";qDay="";qIds=[];qp={};qcl={};chestAt=0;loginDay=0;for(const k in ENDL)delete ENDL[k];PR=Progression.fresh();trial=null;trialBack=null;sel=null;m.style.display="none";render()}}
+ $("rst").onclick=()=>{if(!armed){armed=true;$("rst").textContent=L2("Tap again to confirm","اضغط مرة أخرى للتأكيد");return}resetProgress();m.style.display="none";render()}}
+/* Personal bests from data the game already keeps (this device only, not a global ranking) */
+function bestsBox(){const ar=lang==="ar",nm=s=>ar?s.ar:s.en;let e=null,bp=null,p3=0;
+ SITES.forEach(s=>{const v=ENDL[s.id];if(v>5&&(!e||v>e.v))e={s,v};const st=starSum(s.id);if(st&&(!bp||st>bp.st))bp={s,st};p3+=(SR[s.id]||[]).filter(x=>x>=3).length});
+ const r=(ic,l,v)=>'<div class="pb-row">'+icn(ic)+'<span>'+l+'</span><b>'+v+'</b></div>';
+ return'<div class="pb-box"><h3 class="sh-sub">'+L2("Personal bests","أفضل نتائجك")+' <span>'+L2("on this device","على هذا الجهاز")+'</span></h3>'+
+  r("star",L2("Best place","أفضل مكان"),bp?nm(bp.s)+" · "+bp.st+"/15":"—")+r("trophy",L2("★★★ levels","مستويات ★★★"),p3)+
+  r("infinity",L2("Highest Endless","أعلى مستوى لا نهائي"),e?L2("Level ","المستوى ")+e.v+" · "+nm(e.s):L2("Clear a level 5 to unlock","اجتز مستوى 5 لفتحه"))+'</div>'}
+/* Wipe all progress (two-tap confirm in Collection and Settings). Settings (sound, language, vibration, motion) are kept. */
+function resetProgress(){score=0;done.clear();seen.clear();for(const k in prog)delete prog[k];Object.keys(lvl).forEach(k=>delete lvl[k]);ach.clear();streak=0;lastDay="";dailyClaim="";for(const k in SR)delete SR[k];spent=0;inv.hint=5;inv.time=0;inv.boost=0;inv.freeze=0;inv.ward=0;curseOn=false;own.clear();theme="classic";themeMode="auto";qDay="";qIds=[];qp={};qcl={};chestAt=0;loginDay=0;for(const k in ENDL)delete ENDL[k];PR=Progression.fresh();trial=null;trialBack=null;sel=null;}
 
 /* ---------- UI ---------- */
 function select(id){snd("tap");quipFor("select");sel=SITES.find(s=>s.id===id);if(!seen.has(id)){seen.add(id);score+=Math.round(10*RATE)}render()}
@@ -33,7 +42,7 @@ const chestShort=()=>{const ms=chestAt-Date.now();if(ms<=0)return L2("OPEN","ا�
    "@name" → <span class="ico ico-name">, styled in css/style.css (CSS-mask icons take the text colour). */
 function setRich(el,parts){el.textContent="";for(const p of parts){if(typeof p==="string"&&p[0]==="@"&&p.length>1){const i=document.createElement("span");i.className="ico ico-"+p.slice(1);i.setAttribute("aria-hidden","true");el.appendChild(i)}else el.appendChild(document.createTextNode(String(p)))}}
 function render(){checkUnlocks();newQuestDay();checkAch();save();const t=T[lang],ar=lang==="ar";
- document.documentElement.lang=lang;document.documentElement.dir=ar?"rtl":"ltr";
+ document.documentElement.lang=lang;document.documentElement.classList.toggle("reduce-motion",motionOff);document.documentElement.dir=ar?"rtl":"ltr";
  $("title").textContent=t.title;setRich($("score"),["@coin"," "+bal(),...(streak>0?["  ","@flame",String(streak)]:[])]);$("score").setAttribute("aria-label",t.score+": "+bal()+(streak>0?" · "+L2("streak ","تتابع ")+streak:""));$("score").title=t.score;{/* v4.6 phase 2: map hint = how-to tip (first visits only) + next place with a progress bar */
  const nx=nextLocked(),h=$("hint");h.textContent="";
  if(done.size<2){const tip=document.createElement("span");tip.className="hint-tip";tip.textContent=t.hintMap;h.appendChild(tip)}
@@ -56,7 +65,7 @@ $("lside").innerHTML="";$("rside").innerHTML="";
  {const ql=sb("lside","quests",qDone()+"/3",openQuests,qDone()>=3?"done":""),n=qIds.filter(id=>(qp[id]||0)>=QDEFS.find(q=>q.id===id).goal&&!qcl[id]).length;
  if(n){const bd=document.createElement("span");bd.className="sbadge";bd.textContent=n;bd.setAttribute("aria-label",L2(n+" to claim",n+" للاستلام"));ql.parentNode.appendChild(bd)}}
  if(eventMult()>1)sb("lside","event","×2",null,"done")}
-sb("rside","bonus",L2("Bonus","إضافي"),openBonus);sb("rside","book",L2("Book","السجل"),openCollection);sb("rside","shop",L2("Shop","المتجر"),openShop);
+sb("rside","bonus",L2("Bonus","إضافي"),openBonus);sb("rside","progress",L2("Progress","التقدم"),openCollection);sb("rside","shop",L2("Shop","المتجر"),openShop);
 
  const inf=$("info");if(sel&&mode==="map"){inf.style.display="block";$("iname").textContent=ar?sel.ar:sel.en;$("iera").textContent=ar?sel.eraAr:sel.eraEn;
   {const a=$("iart");if(a.dataset.id!==sel.id){a.dataset.id=sel.id;a.innerHTML='<img src="'+placeArt(sel.id)+'" alt="" decoding="async">'}}

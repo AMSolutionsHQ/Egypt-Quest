@@ -94,7 +94,7 @@ function drawMap(t){
  compassRose(46,MH()-122,22);
  // markers
  /* v4.3: a newly opened place pops in with gold rings (~1.2 s, tap to skip, off with reduced motion) */
- if(revealAt&&(REDUCED_MOTION||t-revealAt.t0>1200))revealAt=null;
+ if(revealAt&&(motionReduced()||t-revealAt.t0>1200))revealAt=null;
  const nl=nextLocked();SITES.forEach((st,i)=>{if(!unlocked(i)&&i!==nl)return;const rv=revealAt&&revealAt.id===st.id?Math.max(0,(t-revealAt.t0)/1200):1;const[qx,qy]=mp(st.lon,st.lat),x=qx+(st.mapDx||0),y=qy+(st.mapDy||0),on=sel&&sel.id===st.id,lk=!unlocked(i),dn=done.has(st.id),bob=on?Math.sin(t/180)*3:0,k=(on?1.25:1)*(rv<1?.35+.65*(1-Math.pow(1-rv,3)):1),R=17*k;
   if(rv<1){ctx.save();for(let j=0;j<3;j++){const q=rv*1.4-j*.2;if(q<=0||q>=1)continue;ctx.globalAlpha=1-q;ctx.beginPath();ctx.arc(x,y,17+q*60,0,7);ctx.strokeStyle="#ffe08a";ctx.lineWidth=3*(1-q)+1;ctx.stroke()}ctx.restore()}
   if(!lk&&!dn){const p=1+.22*Math.sin(t/400+i);ctx.beginPath();ctx.arc(x,y+bob,(R+6)*p,0,7);ctx.strokeStyle="rgba(255,224,138,.8)";ctx.lineWidth=2;ctx.stroke()}
@@ -108,7 +108,6 @@ function drawMap(t){
   if(st.id===dailyId&&dailyClaim!==today()&&!lk){const bx=x+R*.85,by=y+bob-R*.85;ctx.save();ctx.fillStyle="#13243a";ctx.beginPath();ctx.arc(bx,by,9,0,7);ctx.fill();ctx.strokeStyle="#ffe3a0";ctx.lineWidth=1.5;ctx.stroke();starPath(bx,by+.5,6);ctx.fillStyle="#f3c969";ctx.fill();ctx.restore()}
   if(on||MV.z>1.35||W>720){ctx.font="bold 12px system-ui";const nm=ar?st.ar:st.en,w=ctx.measureText(nm).width+14;ctx.fillStyle="rgba(20,26,40,.82)";rr(x-w/2,y+R+10,w,20,10);ctx.fill();ctx.fillStyle="#fff4d0";ctx.textAlign="center";ctx.fillText(nm,x,y+R+24)}});
 }
-const REDUCED_MOTION=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
 function mapPick(px,py){revealAt=null;if(gs){const[gx,gy]=mp(gs.lo,gs.la);if(Math.hypot(px-gx,py-gy)<36){if(gs.cursed){const n=loseBal(Math.round(20*RATE));gfx.push({x:gx,y:gy,t0:performance.now(),txt:n?"−"+n:L2("Blocked","تم الصد"),icon:n?"skull":"shield",bad:true});gs=null;snd("bad");render();return}gfx.push({x:gx,y:gy,t0:performance.now()});gs=null;score+=Math.round(15*RATE);qAdd("scarab",1);snd("ok");render();return}}let best=null,bd=26;const nl=nextLocked();SITES.forEach((s,k)=>{if(!unlocked(k)&&k!==nl)return;const[x,y]=mp(s.lon,s.lat),d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=s}});if(best)select(best.id)}
 let gs=null,gsNext=performance.now()+12000,gfx=[];
 const inEgypt=(lo,la)=>{let c=false;for(let i=0,j=OUT.length-1;i<OUT.length;j=i++){const[a,b]=OUT[i],[p,q]=OUT[j];if((b>la)!==(q>la)&&lo<(p-a)*(la-b)/(q-b)+a)c=!c}return c};

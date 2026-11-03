@@ -6,6 +6,9 @@ let PR=Progression.fresh(),pendingReveal=null;
 const unlocked=i=>i===0||(i>0&&!!SITES[i]&&(Progression.placeOpen(PR,SITES,i)||done.has(SITES[i].id)));
 const nextLocked=()=>SITES.findIndex((s,i)=>!unlocked(i));
 /* v4.5: places are bought with points (config PROGRESSION.placeUnlock="points"), in map order */
+/* v4.6 phase 5: player settings (saved): vibration on mistakes, reduce motion (also follows the system setting) */
+let vibOn=true,motionOff=false;
+const motionReduced=()=>motionOff||!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
 /* v4.6 phase 4: shared menu pieces — icon span and a sheet header with a back button */
 const icn=n=>'<span class="ico ico-'+n+'" aria-hidden="true"></span>';
 const menuHead=(icon,title,closeId,right)=>'<div class="mh"><button class="mh-back" id="'+closeId+'" aria-label="'+L2("Close","إغلاق")+'">'+icn("back")+'</button><h2>'+(icon?icn(icon):"")+'<span>'+title+'</span></h2>'+(right||"")+'</div>';
@@ -38,6 +41,7 @@ let curseOn=false,curseRun=false,curseLost=0,lastCurse=false,curseTax=0;
 function loseBal(n){if((inv.ward||0)>0&&n>0){inv.ward--;toastTx="🛡️ "+L2("Ward blocked the curse!","الدرع صدّ اللعنة!");toastT=performance.now()+1500;return 0}n=Math.min(n,Math.max(0,bal()));if(n>0)spent+=n;return n}
 const starSum=id=>(SR[id]||[]).reduce((a,b)=>a+b,0),totalStars=()=>SITES.reduce((a,s)=>a+starSum(s.id),0);
 const TH={classic:{s1:"#0f4c75",s2:"#1b6ca8",l1:"#ead08f",l2:"#c99a55"},sunset:{s1:"#3b2a6b",s2:"#d4577a",l1:"#f3b36b",l2:"#b9663f"},night:{s1:"#050d1c",s2:"#12305a",l1:"#7a7a98",l2:"#46486a"}};
+const THN_SHORT={classic:["Sunny","مشمس"],sunset:["Sunset","الغروب"],night:["Night","الليل"]}; // swatch labels
 const THN={classic:["Classic (sunny)","كلاسيكي (مشمس)"],sunset:["Sunset","الغروب"],night:["Night","الليل"]};
 const LVN=[["Easy","سهل"],["Normal","عادي"],["Hard","صعب"],["Expert","خبير"],["Legend","أسطوري"]];
 const starTxt=n=>"★".repeat(n)+"☆".repeat(3-n);
