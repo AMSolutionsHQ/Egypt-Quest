@@ -114,6 +114,11 @@ If you target kids, set `ADS.childDirected=true` (Google Families policy).
 
 ## Web deploy
 
+**Cloudflare Pages** (recommended): Workers & Pages → Create application → Pages → Connect to Git → this repo.
+Framework preset *None*, Build command `exit 0`, Build output directory `www`. Every push to `main` deploys automatically.
+`www/_headers` keeps `sw.js` and `index.html` uncached so updates reach players, and caches the fonts for a year.
+
+
 Upload the `www/` folder to any static host over HTTPS (Netlify, Vercel, Firebase Hosting, GitHub Pages via Actions).
 The service worker makes it installable and playable offline. Bump `CACHE` in `www/sw.js` on each release.
 
