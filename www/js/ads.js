@@ -2,7 +2,9 @@
    Ads layer — one API, three providers:
      "admob" : Android app (Capacitor + @capacitor-community/admob)
      "h5"    : browser (Google H5 Games Ads / AdSense for games)
-     "mock"  : test mode with no SDK available (shows a fake ad so you can check layouts)
+     "mock"  : DEVELOPMENT ONLY — a placeholder overlay to check layouts. It is used only when
+               ADS.test is true AND the page runs on localhost/127.0.0.1 AND the URL has ?devads=1.
+               It can never run in a release build, on a real website or inside the Android app.
    The game only calls:
      Ads.update()               – show/hide the map banner (called from render)
      Ads.countFinish()          – a level or bonus game ended
@@ -11,6 +13,8 @@
      Ads.rewarded(name)         – Promise<boolean>: true if the player earned the reward
    Rules: never during gameplay, banner only on the map, interstitials capped by ADS config.
    ============================================================ */
+/* No ad provider = no rewarded buttons are shown and no reward can be granted. */
+const devMockAllowed=()=>{try{return ADS.test===true&&/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)&&new URLSearchParams(location.search).has("devads")}catch(e){return false}};
 let adH=0; // px reserved at the bottom of the map for the banner (read by map.js / CSS --ad-h)
 const Ads=(()=>{
  const TEST_IDS={banner:"ca-app-pub-3940256099942544/9214589741",interstitial:"ca-app-pub-3940256099942544/1033173712",rewarded:"ca-app-pub-3940256099942544/5224354917"};
@@ -64,10 +68,10 @@ const Ads=(()=>{
  };
  const mock={
   init(){rewardReady=true},
-  banner(on){const el=$("adbanner");if(on&&!bannerShown){el.innerHTML='<div style="width:320px;height:50px;border:1px dashed #556;color:#889;font:12px system-ui;display:flex;align-items:center;justify-content:center">Ad banner (test)</div>';el.style.display="flex";setAdH(54);bannerShown=true}
+  banner(on){const el=$("adbanner");if(on&&!bannerShown){el.innerHTML='<div style="width:320px;height:50px;border:1px dashed #556;color:#889;font:12px system-ui;display:flex;align-items:center;justify-content:center">DEV placeholder banner (not a real ad)</div>';el.style.display="flex";setAdH(54);bannerShown=true}
    else if(!on&&bannerShown){el.style.display="none";el.innerHTML="";setAdH(0);bannerShown=false}},
   show(kind,secs){return new Promise(res=>{const o=$("adov");pauseAudio();let left=secs,done=false;
-   o.innerHTML='<div class="box"><b style="color:var(--gold)">'+(kind==="reward"?"🎬 "+L2("Rewarded ad (test)","إعلان بمكافأة (تجريبي)"):"📺 "+L2("Ad (test)","إعلان (تجريبي)"))+'</b><div class="bar"><i id="adpb"></i></div><button class="bbtn" id="adx" style="text-align:center"></button></div>';
+   o.innerHTML='<div class="box"><b style="color:var(--gold)">'+(kind==="reward"?L2("DEV placeholder — rewarded ad (not a real ad)","تجربة مطوّر — إعلان بمكافأة (ليس إعلانًا حقيقيًا)"):L2("DEV placeholder — ad (not a real ad)","تجربة مطوّر — إعلان (ليس إعلانًا حقيقيًا)"))+'</b><div class="bar"><i id="adpb"></i></div><button class="bbtn" id="adx" style="text-align:center"></button></div>';
    o.style.display="flex";const btn=$("adx"),pb=$("adpb");
    const fin=ok=>{if(done)return;done=true;clearInterval(iv);o.style.display="none";resumeAudio();res(ok)};
    const tick=()=>{pb.style.width=(100*(secs-left)/secs)+"%";btn.textContent=left>0?(kind==="reward"?L2("Close (no reward)","إغلاق (بدون مكافأة)"):L2("Skip in ","تخطي بعد ")+left+"s"):L2("Close","إغلاق");btn.disabled=kind!=="reward"&&left>0};
@@ -80,7 +84,7 @@ const Ads=(()=>{
  return{
   get provider(){return provider},
   async init(){if(!ADS.enabled)return;
-   try{if(isNative()){if(!plug())return;provider="admob"}else if(ADS.web.client){provider="h5"}else if(ADS.test){provider="mock"}else return;
+   try{if(isNative()){if(!plug())return;provider="admob"}else if(ADS.web.client){provider="h5"}else if(devMockAllowed()){provider="mock";console.warn("Ads: DEV placeholder ads (?devads=1) — not real ads, local testing only")}else return;
     await P[provider].init();ready=true;Ads.update()}catch(e){console.warn("ads init failed",e);provider="none"}},
   update(){bannerWanted=ready&&mode==="map";if(!ready||busy)return;if(bannerWanted!==bannerShown)P[provider].banner(bannerWanted)},
   countFinish(){since++},

@@ -203,6 +203,8 @@ button:active{transform:translateY(1px) scale(.98)}
 .status-icon.is-done{border-color:#7bd5aa;background:rgba(68,181,125,.18)}
 .status-icon.is-done:after{content:"";position:absolute;left:4px;top:1px;width:5px;height:9px;border-right:2px solid #8ce0b7;border-bottom:2px solid #8ce0b7;transform:rotate(45deg)}
 .status-icon.is-locked:before{content:"";position:absolute;left:4px;top:7px;width:8px;height:7px;border:1px solid #d3b766;border-radius:2px;background:#d3b766}
+.ach-list{margin-top:4px}.ach-row{display:flex;gap:7px;align-items:flex-start;margin:3px 0;line-height:1.35}.ach-row.is-on{color:var(--txt)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .status-icon.is-locked:after{content:"";position:absolute;left:6px;top:3px;width:4px;height:6px;border:1px solid #d3b766;border-bottom:0;border-radius:5px 5px 0 0}
 @media(max-width:600px){
  #bmenu .box,#done .box,#adov .box{max-height:calc(100dvh - 20px);padding:20px}

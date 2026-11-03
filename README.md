@@ -107,7 +107,8 @@ Timers are compensated during rewarded ads, audio pauses during ads.
 
 **Web (Google H5 Games Ads / AdSense)**
 1. Apply for AdSense with H5 games ads; set `ADS.web.client = "ca-pub-…"` (and optionally `bannerSlot`).
-2. With `test:true` the H5 test mode is used. With no `client` set and `test:true`, a local **mock** ad is shown so you can check layouts.
+2. With `test:true` the H5 test mode is used. With no `client` set, **no ads and no ad rewards** are offered on the web.
+3. Layout testing only: open `http://localhost:8080/index.html?devads=1` (needs `test:true`) to see clearly-labelled *DEV placeholder* ads. They never appear on a real domain, in a release build (`test:false`) or in the Android app.
 
 If you target kids, set `ADS.childDirected=true` (Google Families policy).
 
@@ -132,7 +133,15 @@ Regenerate icons after editing `resources/`: `npx @capacitor/assets generate --a
 ```bash
 npm test             # unit tests of the progression rules (Node's built-in runner, no dependencies)
 npm run test:e2e     # browser tests of the progression flows (needs: pip install playwright && playwright install chromium)
+python3 tests/e2e/phase1_e2e.py   # saves, missed days, ads, achievements
 ```
+
+## Changelog — v4.4.1 (stability)
+
+- **No fake ads**: the placeholder ad provider runs only on localhost with `?devads=1` and `ADS.test:true`. Without a real ad SDK, no "watch an ad" buttons are shown and no ad reward can be granted (rewards still need the SDK's completed callback).
+- **No missed-day penalty**: a break no longer costs points (the old "mummy's curse"). Only the streak counter restarts; a streak freeze still bridges one missed day. Earned coins, items and achievements are never touched.
+- **Achievements**: locked/unlocked badges use CSS icons again (the emoji filter had removed ✅/⬜); the badge toast keeps its ✦ icon.
+- **Save safety** (`core/savecheck.js`): every field is type- and range-checked on load and on backup restore; valid data passes through unchanged. An unreadable save is kept as `egyptquest.v1.corrupt` and the last good copy (`egyptquest.v1.bak`, written at each start) is loaded instead. If storage is blocked or full, the game keeps running and tells the player once.
 
 ## Changelog — v4.4 (map follows the sun)
 

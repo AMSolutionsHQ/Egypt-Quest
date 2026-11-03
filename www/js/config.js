@@ -2,7 +2,7 @@
    Egypt Quest — global configuration
    Edit this file to tune the game, the place order and ads.
    ============================================================ */
-const VERSION="4.4.0";
+const VERSION="4.4.1";
 
 /* Order of places on the map. Unlock cost grows with position
    (see need() in core/state.js) unless a place sets `req`.
@@ -22,6 +22,8 @@ const PROGRESSION={levelCost:[0,1,2,3,3],placeRule:{levels:3,stars:6},tokenTrial
 /* ---------- Ads ----------
    enabled   : master switch (set false to ship an ad-free build)
    test      : true = use Google test ad units / H5 test mode. MUST be false for release.
+               (Placeholder "dev" ads exist only on localhost with ?devads=1 — see js/ads.js.
+               Without a real provider, no rewarded buttons are shown and no ad reward is ever granted.)
    native    : AdMob ids used inside the Android app (Capacitor)
    web       : Google H5 Games Ads (AdSense for games) used in the browser
    Frequency caps keep ads friendly: no ads during play, only between levels. */
