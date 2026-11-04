@@ -367,7 +367,7 @@ const MapArt=(()=>{
  /* ---------- caches ---------- */
  let envKey="",home=null,view=null,lastMV={z:-1,ox:0,oy:0},movedAt=0;const pool=[document.createElement("canvas"),document.createElement("canvas")];
  const stats={paints:0,lastMs:0,reliefMs:0,reliefCached:false};
- const dprOf=()=>Math.min(devicePixelRatio||1,2);   // same cap as resize() in canvas.js
+ const dprOf=DPR;   // same cap as resize() in canvas.js
  function renderCache(slot,z,ox,oy){const d=dprOf(),c=pool[slot],w=Math.max(1,Math.round(W*d)),h=Math.max(1,Math.round(MH()*d));
   if(c.width!==w||c.height!==h){c.width=w;c.height=h}const g=c.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,w,h);
   const t0=performance.now();paint(g,{W,s:mapS(),cy:mapCY(),z,ox,oy,d});stats.paints++;stats.lastMs=Math.round(performance.now()-t0);
@@ -386,8 +386,13 @@ const MapArt=(()=>{
   const P=(lo,la)=>mp(lo,la),dam=NILE.findIndex(q=>q[1]>=23.97);
   ctx.setLineDash([2.5,15]);ctx.lineDashOffset=-(t/55)%17.5;ctx.strokeStyle=rgba(C.waterHi,.6);ctx.lineWidth=Math.max(1,Math.min(2.2,s0*.018));
   ctx.beginPath();spath(ctx,P,NILE.slice(dam));spath(ctx,P,ROSETTA);ctx.stroke();ctx.setLineDash([]);ctx.restore()}
- function vignette(){const C=pal(),h=MH(),r1=Math.hypot(W,h)*.62,gr=ctx.createRadialGradient(W/2,h*.52,Math.max(W,h)*.34,W/2,h*.52,r1);
-  gr.addColorStop(0,"rgba("+C.fog+",0)");gr.addColorStop(1,"rgba("+C.fog+",.55)");ctx.fillStyle=gr;ctx.fillRect(0,0,W,h)}
+ /* vignette: a full-screen radial gradient is expensive on phones, so paint it once per size/theme and blit it */
+ let vig=null,vigKey="";
+ function vignette(){const C=pal(),h=MH(),key=W+"|"+h+"|"+C.fog;
+  if(key!==vigKey){vigKey=key;const sc=.5;vig=vig||document.createElement("canvas");vig.width=Math.max(1,Math.round(W*sc));vig.height=Math.max(1,Math.round(h*sc));
+   const g=vig.getContext("2d"),r1=Math.hypot(W,h)*.62*sc,gr=g.createRadialGradient(W/2*sc,h*.52*sc,Math.max(W,h)*.34*sc,W/2*sc,h*.52*sc,r1);
+   gr.addColorStop(0,"rgba("+C.fog+",0)");gr.addColorStop(1,"rgba("+C.fog+",.55)");g.clearRect(0,0,vig.width,vig.height);g.fillStyle=gr;g.fillRect(0,0,vig.width,vig.height)}
+  ctx.drawImage(vig,0,0,W,h)}
 
  return{
   stats,
@@ -398,7 +403,7 @@ const MapArt=(()=>{
    const atHome=MV.z===1&&MV.ox===0&&MV.oy===0;
    if(MV.z!==lastMV.z||MV.ox!==lastMV.ox||MV.oy!==lastMV.oy){lastMV={z:MV.z,ox:MV.ox,oy:MV.oy};movedAt=t}
    let fresh=view&&view.z===MV.z&&view.ox===MV.ox&&view.oy===MV.oy;
-   if(!atHome&&!fresh&&t-movedAt>140&&!mptr.size){view=renderCache(1,MV.z,MV.ox,MV.oy);fresh=true}
+   if(!atHome&&!fresh&&t-movedAt>220&&!mptr.size){view=renderCache(1,MV.z,MV.ox,MV.oy);fresh=true}
    /* draw as little as possible: one exact-fit image at rest, both caches only mid-gesture */
    if(atHome)blit(home);else if(fresh)blit(view);else{ctx.fillStyle="rgb("+pal().fog+")";ctx.fillRect(0,0,W,H);blit(home);if(view)blit(view)}
    live(t);vignette()},

@@ -47,7 +47,7 @@ function clampV(){V.z=Math.max(minZ(),Math.min(2.2,V.z));const sw=cur.w*V.z,sh=c
  V.ox=sw<=W?(W-sw)/2:Math.max(W-sw,Math.min(0,V.ox));V.oy=sh<=H?(H-sh)/2:Math.max(H-sh,Math.min(0,V.oy))}
 function initView(){V.z=Math.max(minZ(),Math.min(1,W/800));V.ox=W/2-cur.w/2*V.z;V.oy=H/2-cur.h/2.2*V.z;clampV()}
 function zoomAt(sx,sy,f){const nz=Math.max(minZ(),Math.min(2.2,V.z*f)),r=nz/V.z;V.ox=sx-(sx-V.ox)*r;V.oy=sy-(sy-V.oy)*r;V.z=nz;clampV()}
-function art(a,t,i){if(found.has(i))return;ctx.save();ctx.translate(a[0],a[1]);const sc=i<0?1:Math.max(.6,1-LV()*.08);ctx.scale(sc,sc);if(i>=0){const gr=ctx.createRadialGradient(0,0,2,0,0,26);gr.addColorStop(0,"rgba(255,255,255,.75)");gr.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,26,0,7);ctx.fill();ctx.globalAlpha=.8+.2*Math.sin(t/260+i)}
+function art(a,t,i){if(found.has(i))return;ctx.save();ctx.translate(a[0],a[1]);const sc=i<0?1:Math.max(.6,1-LV()*.08);ctx.scale(sc,sc);if(i>=0){ctx.drawImage(halo(),-26,-26,52,52);ctx.globalAlpha=.8+.2*Math.sin(t/260+i)}
  if(hintIdx===i&&t<hintUntil){ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,26+6*Math.sin(t/120),0,7);ctx.stroke()}
  switch(a[2]){
  case"ankh":for(const[c,w]of[["#4a2f0a",8],["#e6b84a",4]]){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.ellipse(0,-7,6,8,0,0,7);ctx.moveTo(0,1);ctx.lineTo(0,14);ctx.moveTo(-8,5);ctx.lineTo(8,5);ctx.stroke()}break;
@@ -59,13 +59,24 @@ function art(a,t,i){if(found.has(i))return;ctx.save();ctx.translate(a[0],a[1]);c
  case"lotus":ctx.fillStyle="#e87aa8";for(const a of[-.7,0,.7]){ctx.save();ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,-7,4.5,10,0,0,7);ctx.fill();ctx.restore()}ctx.fillStyle="#3f8f4a";ctx.beginPath();ctx.ellipse(0,6,10,3.5,0,0,7);ctx.fill();break;
  case"coin":ctx.fillStyle="#e6b84a";ctx.beginPath();ctx.arc(0,0,10,0,7);ctx.fill();ctx.strokeStyle="#8a6a10";ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(0,0,5,0,7);ctx.stroke();break}
  ctx.restore()}
+/* The ground, buildings, palms and labels never change during a run, so they are painted once into an
+   offscreen canvas (per place + language) and blitted each frame instead of re-drawing ~80 shapes. */
+function worldBase(){const key=lang+"|"+DPR();if(cur._wc&&cur._wk===key)return;
+ const cs=Math.min(2,DPR()*1.5,Math.sqrt(4.5e6/(cur.w*cur.h))),c=cur._wc||document.createElement("canvas");
+ c.width=Math.ceil(cur.w*cs);c.height=Math.ceil(cur.h*cs);const g=c.getContext("2d"),o=ctx;
+ ctx=g;try{g.setTransform(cs,0,0,cs,0,0);
+  ctx.fillStyle=cur.sea||cur.ground;ctx.fillRect(0,0,cur.w,cur.h);
+  if(cur.sea){ctx.strokeStyle="rgba(255,255,255,.12)";ctx.lineWidth=2;ctx.setLineDash([36,30]);for(let y=30;y<cur.h;y+=46){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cur.w,y);ctx.stroke()}ctx.setLineDash([])}
+  cur.items.forEach(i=>GRD[i.t]&&item(i));
+  cur.items.forEach(i=>!GRD[i.t]&&item(i));
+ }finally{ctx=o}cur._wc=c;cur._wk=key}
+/* soft white halo behind each artifact: one pre-rendered sprite instead of a new radial gradient per artifact per frame */
+let HALO=null;function halo(){if(HALO)return HALO;const c=document.createElement("canvas");c.width=c.height=104;const g=c.getContext("2d"),gr=g.createRadialGradient(52,52,8,52,52,104/2);
+ gr.addColorStop(0,"rgba(255,255,255,.75)");gr.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=gr;g.beginPath();g.arc(52,52,52,0,7);g.fill();return HALO=c}
 function drawWorld(t){
  ctx.fillStyle=cur.bg||"#0e1420";ctx.fillRect(0,0,W,H);
  ctx.save();ctx.translate(V.ox,V.oy);ctx.scale(V.z,V.z);
- ctx.fillStyle=cur.sea||cur.ground;ctx.fillRect(0,0,cur.w,cur.h);
- if(cur.sea){ctx.strokeStyle="rgba(255,255,255,.12)";ctx.lineWidth=2;for(let y=30;y<cur.h;y+=46){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cur.w,y);ctx.setLineDash([36,30]);ctx.stroke();ctx.setLineDash([])}}
- cur.items.forEach(i=>GRD[i.t]&&item(i));
- cur.items.forEach(i=>!GRD[i.t]&&item(i));
+ worldBase();ctx.drawImage(cur._wc,0,0,cur.w,cur.h);
  cur.arts.forEach((a,i)=>art(a,t,i));
  {const rem=cur.arts.map((a,i)=>i).filter(i=>!found.has(i));if(rem.length===1&&t-lastFindT>15000){const a=cur.arts[rem[0]];ctx.strokeStyle="rgba(255,255,255,.85)";ctx.lineWidth=3;ctx.beginPath();ctx.arc(a[0],a[1],30+5*Math.sin(t/200),0,7);ctx.stroke()}}
  ctx.strokeStyle="#8a6a35";ctx.lineWidth=4;ctx.strokeRect(0,0,cur.w,cur.h);
@@ -76,7 +87,7 @@ function drawWorld(t){
   else{ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.beginPath();ctx.arc(f.x,f.y,6+k*22,0,7);ctx.stroke()}});
  ctx.globalAlpha=1;ctx.restore();
  {const rem=cur.arts.map((a,i)=>i).filter(i=>!found.has(i));if(rem.length===1&&!runWon){const a=cur.arts[rem[0]],sx=V.ox+a[0]*V.z,sy=V.oy+a[1]*V.z;if(sx<10||sx>W-10||sy<70||sy>H-90){const cx=W/2,cy=H/2,ang=Math.atan2(sy-cy,sx-cx),px=Math.max(24,Math.min(W-24,cx+Math.cos(ang)*1000)),py=Math.max(84,Math.min(H-100,cy+Math.sin(ang)*1000));ctx.save();ctx.translate(px,py);ctx.rotate(ang);ctx.fillStyle="#fff";ctx.strokeStyle="#3a2208";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(14,0);ctx.lineTo(-8,-10);ctx.lineTo(-8,10);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}}}}
-function worldTap(sx,sy){if(runWon)return;const wx=(sx-V.ox)/V.z,wy=(sy-V.oy)/V.z,R=Math.max(34,26/V.z);let bi=-1,bd=R;
+function worldTap(sx,sy){if(runWon)return;const wx=(sx-V.ox)/V.z,wy=(sy-V.oy)/V.z,R=Math.max(34,(COARSE?40:28)/V.z);let bi=-1,bd=R;
  cur.arts.forEach((a,i)=>{if(found.has(i))return;const d=Math.hypot(a[0]-wx,a[1]-wy);if(d<bd){bd=d;bi=i}});
  const now=performance.now();
  if(bi<0){fx.push({k:"miss",x:wx,y:wy,t0:now});snd("miss");huntMiss++;return}

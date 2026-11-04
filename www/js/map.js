@@ -25,10 +25,10 @@ const MV={z:1,ox:0,oy:0};const mptr=new Map();let mmoved=0,mpinch=0;
 const ROSETTA=[[31.18,30.2],[30.95,30.5],[30.82,30.85],[30.55,31.05],[30.4,31.21]]; // Rosetta branch of the Delta
 function clampMV(){MV.z=Math.max(1,Math.min(3.2,MV.z));const lim=(MV.z-1)*Math.max(W,H)*.42;MV.ox=Math.max(-lim,Math.min(lim,MV.ox));MV.oy=Math.max(-lim,Math.min(lim,MV.oy));if(MV.z===1){MV.ox=0;MV.oy=0}}
 function mapZoom(px,py,f){const nz=Math.max(1,Math.min(3.2,MV.z*f)),r=nz/MV.z,cx=px-W/2,cy=py-mapCY();MV.ox=cx-(cx-MV.ox)*r;MV.oy=cy-(cy-MV.oy)*r;MV.z=nz;clampMV()}
-function mapMove(e){const p=mptr.get(e.pointerId);if(!p)return;
- if(mptr.size===1){MV.ox+=e.clientX-p.x;MV.oy+=e.clientY-p.y;mmoved+=Math.abs(e.clientX-p.x)+Math.abs(e.clientY-p.y);p.x=e.clientX;p.y=e.clientY;clampMV()}
- else{p.x=e.clientX;p.y=e.clientY;const[a,b]=[...mptr.values()],d=Math.hypot(a.x-b.x,a.y-b.y);mmoved=99;if(mpinch)mapZoom((a.x+b.x)/2,(a.y+b.y)/2,d/mpinch);mpinch=d}}
-function mapUp(e){if(mptr.size===1&&mmoved<8&&mptr.has(e.pointerId))mapPick(e.clientX,e.clientY);mptr.delete(e.pointerId);mpinch=0}
+function mapMove(e,nx,ny){const p=mptr.get(e.pointerId);if(!p)return;
+ if(mptr.size===1){mmoved=Math.max(mmoved,Math.hypot(nx-p.sx,ny-p.sy));if(mmoved>=TAP_SLOP){MV.ox+=nx-p.x;MV.oy+=ny-p.y;clampMV()}p.x=nx;p.y=ny}
+ else{p.x=nx;p.y=ny;const[a,b]=[...mptr.values()],d=Math.hypot(a.x-b.x,a.y-b.y);mmoved=99;if(mpinch)mapZoom((a.x+b.x)/2,(a.y+b.y)/2,d/mpinch);mpinch=d}}
+function mapUp(e){if(mptr.size===1&&mmoved<TAP_SLOP&&mptr.has(e.pointerId)){const p=mptr.get(e.pointerId);mapPick(p.sx,p.sy)}mptr.delete(e.pointerId);mpinch=0}
 function lineMap(pts){ctx.beginPath();pts.forEach(([a,b],i)=>{const p=mp(a,b);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])})}
 function smoothMap(pts){ctx.beginPath();pts.forEach(([a,b],i)=>{const p=mp(a,b);if(!i)ctx.moveTo(p[0],p[1]);else{const q=mp(...pts[i-1]);ctx.quadraticCurveTo(q[0],q[1],(q[0]+p[0])/2,(q[1]+p[1])/2)}})}
 function alongNile(u){const n=NILE.length-1,f=u*n,i=Math.min(n-1,Math.floor(f)),k=f-i,a=NILE[i],b=NILE[i+1];return mp(a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k)}
@@ -108,7 +108,7 @@ function drawMap(t){
   if(st.id===dailyId&&dailyClaim!==today()&&!lk){const bx=x+R*.85,by=y+bob-R*.85;ctx.save();ctx.fillStyle="#13243a";ctx.beginPath();ctx.arc(bx,by,9,0,7);ctx.fill();ctx.strokeStyle="#ffe3a0";ctx.lineWidth=1.5;ctx.stroke();starPath(bx,by+.5,6);ctx.fillStyle="#f3c969";ctx.fill();ctx.restore()}
   if(on||MV.z>1.35||W>720){ctx.font="bold 12px system-ui";const nm=ar?st.ar:st.en,w=ctx.measureText(nm).width+14;ctx.fillStyle="rgba(20,26,40,.82)";rr(x-w/2,y+R+10,w,20,10);ctx.fill();ctx.fillStyle="#fff4d0";ctx.textAlign="center";ctx.fillText(nm,x,y+R+24)}});
 }
-function mapPick(px,py){revealAt=null;if(gs){const[gx,gy]=mp(gs.lo,gs.la);if(Math.hypot(px-gx,py-gy)<36){if(gs.cursed){const n=loseBal(Math.round(20*RATE));gfx.push({x:gx,y:gy,t0:performance.now(),txt:n?"−"+n:L2("Blocked","تم الصد"),icon:n?"skull":"shield",bad:true});gs=null;snd("bad");render();return}gfx.push({x:gx,y:gy,t0:performance.now()});gs=null;score+=Math.round(15*RATE);qAdd("scarab",1);snd("ok");render();return}}let best=null,bd=26;const nl=nextLocked();SITES.forEach((s,k)=>{if(!unlocked(k)&&k!==nl)return;const[x,y]=mp(s.lon,s.lat),d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=s}});if(best)select(best.id)}
+function mapPick(px,py){revealAt=null;if(gs){const[gx,gy]=mp(gs.lo,gs.la);if(Math.hypot(px-gx,py-gy)<(COARSE?42:36)){if(gs.cursed){const n=loseBal(Math.round(20*RATE));gfx.push({x:gx,y:gy,t0:performance.now(),txt:n?"−"+n:L2("Blocked","تم الصد"),icon:n?"skull":"shield",bad:true});gs=null;snd("bad");render();return}gfx.push({x:gx,y:gy,t0:performance.now()});gs=null;score+=Math.round(15*RATE);qAdd("scarab",1);snd("ok");render();return}}let best=null,bd=COARSE?34:26;const nl=nextLocked();SITES.forEach((s,k)=>{if(!unlocked(k)&&k!==nl)return;const[qx,qy]=mp(s.lon,s.lat),on=sel&&sel.id===s.id,x=qx+(s.mapDx||0),y=qy+(s.mapDy||0),d=Math.hypot(px-x,py-y)-(on?4:0);if(d<bd){bd=d;best=s}});if(best)select(best.id)}
 let gs=null,gsNext=performance.now()+12000,gfx=[];
 const inEgypt=(lo,la)=>{let c=false;for(let i=0,j=OUT.length-1;i<OUT.length;j=i++){const[a,b]=OUT[i],[p,q]=OUT[j];if((b>la)!==(q>la)&&lo<(p-a)*(la-b)/(q-b)+a)c=!c}return c};
 function updGS(t){if(!gs&&t>gsNext){for(let k=0;k<40;k++){const lo=26+Math.random()*8.5,la=22.5+Math.random()*8.8;if(inEgypt(lo,la)){gs={lo,la,until:t+7000,cursed:Math.random()<.3};break}}gsNext=t+(18000+Math.random()*18000)*(own.has("lucky")?.5:1)}if(gs&&t>gs.until)gs=null}
