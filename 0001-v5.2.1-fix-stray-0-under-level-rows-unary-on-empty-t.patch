@@ -1,0 +1,83 @@
+From f95efe07b1493cea80a7ed0c44172c9cf7360180 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 7 Nov 2026 20:31:57 +0200
+Subject: [PATCH] v5.2.1: fix stray 0 under level rows (unary + on empty trial
+ row); shrink long win quip to fit narrow screens
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01V2e4SwfEexwvJtHFGa8sVP
+---
+ package.json            | 2 +-
+ www/js/config.js        | 2 +-
+ www/js/core/fx.js       | 2 +-
+ www/js/core/progress.js | 2 +-
+ www/sw.js               | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/package.json b/package.json
+index 21ec4a0..5951bda 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "egypt-quest",
+-  "version": "5.2.0",
++  "version": "5.2.1",
+   "private": true,
+   "description": "Egypt Quest — map adventure with a mini-game at every site. Web (PWA) + Android (Capacitor).",
+   "scripts": {
+diff --git a/www/js/config.js b/www/js/config.js
+index 35fa371..27af728 100644
+--- a/www/js/config.js
++++ b/www/js/config.js
+@@ -2,7 +2,7 @@
+    Egypt Quest — global configuration
+    Edit this file to tune the game, the place order and ads.
+    ============================================================ */
+-const VERSION="5.2.0";
++const VERSION="5.2.1";
+ 
+ /* Order of places on the map. Unlock cost grows with position
+    (see need() in core/state.js) unless a place sets `req`.
+diff --git a/www/js/core/fx.js b/www/js/core/fx.js
+index 05123f5..73d9533 100644
+--- a/www/js/core/fx.js
++++ b/www/js/core/fx.js
+@@ -10,7 +10,7 @@ function drawCeleb(t){if(!celeb)return;const k=(t-celeb.t0)/1800;if(k>1){celeb=n
+  ctx.fillStyle="#e6b84a";ctx.beginPath();ctx.ellipse(0,0,r*.95,r*1.15,0,0,7);ctx.fill();ctx.lineWidth=4;ctx.stroke();
+  ctx.fillStyle="#2f6fd8";ctx.beginPath();ctx.moveTo(-r*.7,-r*.85);ctx.lineTo(r*.7,-r*.85);ctx.lineTo(0,-r*1.7);ctx.closePath();ctx.fill();
+  face(0,-r*.1,r*.85,1);ctx.save();ctx.scale(r/20,r/20);sunFace(0,-3,1);ctx.restore();ctx.restore();
+- const sc=1+.08*Math.sin(t/120),fs=Math.round(Math.min(W/10,34)*sc);ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,a*1.5));ctx.textAlign="center";ctx.font="bold "+fs+"px system-ui";ctx.lineWidth=6;ctx.strokeStyle="#3a2208";ctx.fillStyle="#fff4d0";
++ const sc=1+.08*Math.sin(t/120);let fs=Math.round(Math.min(W/10,34)*sc);ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,a*1.5));ctx.textAlign="center";ctx.font="bold "+fs+"px system-ui";{const tw=ctx.measureText(celeb.txt).width,mx=W*.9;if(tw>mx){fs=Math.max(12,Math.floor(fs*mx/tw));ctx.font="bold "+fs+"px system-ui"}}ctx.lineWidth=6;ctx.strokeStyle="#3a2208";ctx.fillStyle="#fff4d0";
+  ctx.strokeText(celeb.txt,W/2,cy+r*2.6);ctx.fillText(celeb.txt,W/2,cy+r*2.6);ctx.font=Math.round(fs*1.3)+"px system-ui";const st="★".repeat(celeb.stars)+"☆".repeat(3-celeb.stars);ctx.fillStyle="#ffd54a";ctx.strokeText(st,W/2,cy+r*2.6+fs*1.6);ctx.fillText(st,W/2,cy+r*2.6+fs*1.6);ctx.restore()}
+ function showErr(m){let b=document.getElementById("errbar");if(!b){b=document.createElement("div");b.id="errbar";b.style.cssText="position:fixed;left:8px;right:8px;top:calc(8px + env(safe-area-inset-top,0px));z-index:50;background:#7a1f1f;color:#fff;font:12px system-ui;padding:8px 10px;border-radius:8px;word-break:break-word";document.body.appendChild(b);b.onclick=()=>{b.style.display="none"}}b.textContent="⚠ "+m+" (v"+VERSION+", tap to hide)";b.style.display="block"}
+ addEventListener("error",e=>showErr((e.message||"error")+" @"+(e.lineno||"?")));addEventListener("unhandledrejection",e=>showErr(String(e.reason)));
+diff --git a/www/js/core/progress.js b/www/js/core/progress.js
+index 63bcbde..af1f7f7 100644
+--- a/www/js/core/progress.js
++++ b/www/js/core/progress.js
+@@ -30,7 +30,7 @@ function openLevels(){const ar=lang==="ar",m=$("bmenu"),id=sel.id,b=SR[id]||(SR[
+  let nextI=-1;for(let i=0;i<5;i++)if(nextI<0&&Progression.levelStatus(SR,PR,id,i)==="open"&&!Progression.levelDone(SR,PR,id,i))nextI=i;
+  const rows=[0,1,2,3,4].map(i=>{const st=Progression.levelStatus(SR,PR,id,i),dn=Progression.levelDone(SR,PR,id,i),cost=Progression.levelCost(i),nm=L2("Level ","المستوى ")+(i+1)+" · "+LVN[i][ar?1:0],info=lvInfo(id,i+1);
+   if(st==="open"){const bt=Records.time(id,i),bts=bt?" · "+L2("best ","الأفضل ")+Math.floor(bt/60)+":"+String(bt%60).padStart(2,"0"):"";return row('data-l="'+(i+1)+'"',dn?"is-done":i===nextI?"is-next":"is-open",dn?"check":"play",nm,(cl[i]&&!b[i]?L2("passed by trial","اجتزته بالاختبار"):(info||(dn?L2("Replay to beat your best","أعد اللعب لتحسين نتيجتك"):L2("Ready to play","جاهز للعب"))))+bts,stars(b[i]))+
+-   +(Progression.passageTrial(SR,PR,id,i)?row('data-t="pass" data-i="'+i+'"',"trial","sparkle",TR+": "+L2("pass level "+(i+1),"اجتز المستوى "+(i+1)),L2("Win a bonus game to mark this level passed (0★, no Ankh)","اربح لعبة إضافية لتجتاز هذا المستوى (0★ بدون عنخ)")):"")}
++   (Progression.passageTrial(SR,PR,id,i)?row('data-t="pass" data-i="'+i+'"',"trial","sparkle",TR+": "+L2("pass level "+(i+1),"اجتز المستوى "+(i+1)),L2("Win a bonus game to mark this level passed (0★, no Ankh)","اربح لعبة إضافية لتجتاز هذا المستوى (0★ بدون عنخ)")):"")}
+   if(st==="afford")return row('data-u="'+i+'"',"unlock","ankh",nm,L2("Tap to unlock for ","اضغط للفتح مقابل ")+ankh(cost)+" · "+L2("you have ","لديك ")+ankh(PR.tok),'<span class="lv-cost">'+ankh(cost)+'</span>');
+   if(st==="short")return row("disabled","is-lock","lock",nm,L2("Needs ","يحتاج ")+ankh(cost)+" · "+L2("you have ","لديك ")+ankh(PR.tok)+" · "+L2("earn Ankh by beating your best stars","اربح العنخ بتحسين أفضل نجومك"),'<span class="lv-cost">'+ankh(cost)+'</span>')+
+    (tt===i?row('data-t="tok" data-i="'+i+'"',"trial","sparkle",TR+": +"+ankh(1),L2("Win a bonus game · "+trLeft("tok")+" left at this place","اربح لعبة إضافية · متبقٍ "+trLeft("tok")+" هنا")):"");
+diff --git a/www/sw.js b/www/sw.js
+index 532f89b..7489486 100644
+--- a/www/sw.js
++++ b/www/sw.js
+@@ -1,7 +1,7 @@
+ /* Offline support for the web build (not used inside the Android app).
+    Same-origin files: served from cache, refreshed in the background.
+    Bump CACHE when you deploy so old files are dropped. */
+-const CACHE="egypt-quest-v5.2.0";
++const CACHE="egypt-quest-v5.2.1";
+ const SHELL=["./","./index.html","./css/style.css","./manifest.webmanifest",
+  ...["cairo-latin-400","cairo-latin-600","cairo-latin-700","cairo-arabic-400","cairo-arabic-600","cairo-arabic-700","el-messiri-latin-700","el-messiri-arabic-700"].map(f=>"./assets/fonts/"+f+"-normal.woff2")];
+ self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});
+-- 
+2.43.0
+
