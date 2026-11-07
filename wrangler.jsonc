@@ -1,7 +1,7 @@
 // Cloudflare Workers deploy settings (used by `npx wrangler deploy` in Workers Builds).
 // Publishes the www/ folder as static files; www/_headers sets caching and security headers.
 // worker/index.js runs first on every request: old *.workers.dev addresses
-// (e.g. egypt-quest.mohammedtaher-6705.workers.dev) are 301-redirected to the official URL.
+// (e.g. egypt-quest.mohammedtaher-6705.workers.dev) return 404 (shut off); only the official URL serves the game.
 {
   "name": "egypt-quest",
   "compatibility_date": "2026-10-01",
